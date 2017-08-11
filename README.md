@@ -5,8 +5,8 @@
 
 Contact us if you are interest in a solution to your business
 
-<table>
-  <tr> <td> Authors: </td> <td> Francisco N. C. Sobral</td> </tr>
+<table style="border: none;">
+  <tr> <td> Authors: </td> <td> Francisco N. C. Sobral</td> <td> `fncsobral at uem dot br` </tr>
   <tr> <td> </td>  <td> Emerson V. Castelani </td> </tr>
   <tr> <td> </td>  <td> Wesley V. I. Shirabayashi </td> </tr>
   <tr> <td> </td>  <td> Rodrigo Schulz </td> </tr>
