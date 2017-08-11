@@ -1,5 +1,4 @@
-# Pack-U
-![][logo]
+# Pack-U <img src='docs/packu.png' style="vertical-align:middle;height:60px">
 
 ### A packing system for online stores.
 
