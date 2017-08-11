@@ -3,3 +3,6 @@ stats.txt
 *.o
 pack
 *~
+sol*.asy
+sol*.csv
+sol*.pdf
