@@ -1,15 +1,19 @@
-# Pack-U
-## A packing system for online stores.
+# Pack-U 
 
-<img align='center' src='docs/packu.png'>
+### A packing system for online stores.
+
+![](docs/packu.png)
 
 Contact us if you are interest in a solution to your business
 
-<table style="border: none;">
-  <tr> <td> Authors: </td> <td> Francisco N. C. Sobral</td> <td> `fncsobral at uem dot br` </tr>
-  <tr> <td> </td>  <td> Emerson V. Castelani </td> </tr>
-  <tr> <td> </td>  <td> Wesley V. I. Shirabayashi </td> </tr>
-  <tr> <td> </td>  <td> Rodrigo Schulz </td> </tr>
-</table>
+Authors:
+
+> Francisco N. C. Sobral - `fncsobral at uem dot br`
+>
+> Emerson V. Castelani
+>
+> Wesley V. I. Shirabayashi
+>
+> Rodrigo Schulz 
 
 Developed at State University of Maringá, Paraná, Brazil.
