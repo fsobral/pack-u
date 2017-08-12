@@ -3,7 +3,7 @@
 
 program algencanma
 
-  use fisiodat
+  use packdat
 
   implicit none
 
@@ -616,7 +616,7 @@ end subroutine myevalhc
 
 subroutine myevalfc(n,x,f,m,c,flag)
 
-  use fisiodat, only: evalover, nItems, iLength
+  use packdat, only: evalover, nItems, iLength
 
   implicit none
 
@@ -655,7 +655,7 @@ end subroutine myevalfc
 
 subroutine alevalfc(n,x,f,m,c,flag)
 
-  use fisiodat, only: evalover, nItems, iLength
+  use packdat, only: evalover, nItems, iLength
 
   implicit none
 
@@ -692,7 +692,7 @@ end subroutine alevalfc
 
 subroutine myevalgjac(n,x,g,m,jcfun,jcvar,jcval,jcnnz,lim,lmem,flag)
 
-  use fisiodat, only : evaldover, nItems
+  use packdat, only : evaldover, nItems
 
   implicit none
 
@@ -752,7 +752,7 @@ end subroutine myevalgjac
 
 subroutine alevalgjac(n,x,g,m,jcfun,jcvar,jcval,jcnnz,lim,lmem,flag)
 
-  use fisiodat, only : evaldover, nItems
+  use packdat, only : evaldover, nItems
 
   implicit none
 

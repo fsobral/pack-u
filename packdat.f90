@@ -1,4 +1,4 @@
-module fisiodat
+module packdat
 
   implicit none
 
@@ -1093,4 +1093,4 @@ contains
 
   end subroutine drawSol
 
-end module fisiodat
+end module packdat
