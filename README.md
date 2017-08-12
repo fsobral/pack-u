@@ -1,9 +1,9 @@
-# Pack-U <img src='docs/images/packu-small.png' style="vertical-align:middle;height:60px">
+# Pack-U ![][logo]
 
 ### A packing system for online stores.
 
 
-Contact us if you are interest in a packing solution
+Contact us if you are interest in a packing solution!
 
 Authors:
 
@@ -19,15 +19,15 @@ Developed at State University of Maringá, Paraná, Brazil.
 
 ## Compiling
 
-Pack-U uses a combination of some heuristics and non-linear
+Pack-U uses a combination of heuristics and non-linear
 programming to solve packing problems Up to now Pack-U only deals with
 *rectangular containers* and *square items*. The items are not allowed
 to rotate. In order to solving non-linear programming problems, Pack-U
-uses [ALGENCAN 3.0.0][].
+uses [ALGENCAN 3.0.0][algencan].
 
 To build Pack-U you need to
 
-  1. Download [ALGENCAN 3.0.0][] and generate its library file
+  1. Download [ALGENCAN 3.0.0][algencan] and generate its library file
   `libalgencan.a`
 
   1. Download Pack-U
@@ -46,6 +46,6 @@ variable, which is `build/` by default.
 
 ## Running
 
-[logo]: docs/packu.png
+[logo]: docs/packu-small.png
 
 [algencan]: http://www.ime.usp.br/~egbirgin/tango
