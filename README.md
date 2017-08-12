@@ -44,8 +44,33 @@ To build Pack-U you need to
 The generated file is located in the path given by `BUILDDIR`
 variable, which is `build/` by default.
 
+## Setting up your problem
+
+Pack-U needs 3 files to solve a packing problem:
+
+  - `containers.txt`: the type of containers that can be used
+  - `items.txt`: the type of items that can be packed
+  - `data.txt`: the number of each type of item to be packed
+
+Usually, files `containers.txt` and `items.txt` do not change very
+often. Each packing problem consists of a different `data.txt` file.
+
 ## Running
 
-[logo]: docs/packu-small.png
+After setting up your problem, to run Pack-U, simply type
+
+    ./build/packu
+
+ALGENCAN provides many configuration parameters by the use of the
+configuration file `algencan.dat`. The number of iterations can be
+controlled by
+
+    INNER-ITERATIONS-LIMIT XXXX
+
+where XXXX is an integer number. The bigger this number the best
+packing solutions it finds. However it takes more time to find the
+result. For online services, it is reasonable to use small numbers.
+
+[logo]: docs/images/packu-small.png
 
 [algencan]: http://www.ime.usp.br/~egbirgin/tango
