@@ -6,3 +6,7 @@ sol*.asy
 sol*.csv
 sol*.pdf
 build/*
+
+# Algencan files
+.silent
+algencan.dat
