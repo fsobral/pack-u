@@ -2,8 +2,12 @@ TANGOLIB = /opt/tango/algencan-3.0.0/lib
 
 PACKPROBLEM = packminc
 
-pack: $(PACKPROBLEM).o packdat.o
+BUILDDIR = build
+
+packu: $(PACKPROBLEM).o packdat.o
 	gfortran $^ -L$(TANGOLIB) -lalgencan -o $@
+	mkdir -p $(BUILDDIR)
+	mv -f $@ $(BUILDDIR)/.
 
 %.o: %.f90
 	gfortran -c $^
@@ -19,4 +23,4 @@ packdat.mod: packdat.f90
 
 clean:
 	rm -f *.mod *.o solution.csv solution.pdf \
-	sol[0-9][0-9][0-9].* pack
+	sol[0-9][0-9][0-9].* build/*

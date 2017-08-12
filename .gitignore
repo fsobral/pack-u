@@ -1,8 +1,8 @@
 stats.txt
 *.mod
 *.o
-pack
 *~
 sol*.asy
 sol*.csv
 sol*.pdf
+build/*
