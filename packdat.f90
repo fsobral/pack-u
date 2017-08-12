@@ -114,12 +114,16 @@ contains
     integer :: i, c
     real(8) :: tiArea, tbArea
 
+    tiArea = 0.0D0
+    
     do i = 1, nTItems
 
        tiArea = tiArea + iWidth_(i) * iLength_(i)
 
     end do
 
+    c = 0.0D0
+    
     do i = 1, nTContainers
 
        c = cTypeUsed_(i)
@@ -128,7 +132,8 @@ contains
 
     end do
 
-    write(*,FMT=0080) nTContainers, tbArea, tiArea, tbArea / tiArea, &
+    write(*,FMT=0080) nTContainers, tbArea, tiArea, &
+         (tbArea / tiArea - 1.0D0) * 100.0D0, &
          elapsedTime * 1.0D+02
 
     ! Save STATS in file
@@ -136,7 +141,8 @@ contains
     open(99, FILE='stats.txt')
     
     write(99, FMT=0090) nTContainers, tbArea, tiArea, &
-         tbArea / tiArea, elapsedTime * 1.0D+02
+         (tbArea / tiArea - 1.0D0) * 100.0D0,         &
+         elapsedTime * 1.0D+02
 
     close(99)
 
@@ -144,7 +150,7 @@ contains
           'Number of containers:', 35X, I4,/             &
           'Total area:', 39X, F10.2, /                   &
           'Total item area:', 34X, F10.2, /,             &
-          'Waste ratio:', 38X, F10.6, /,                 &
+          'Waste ratio (%):', 34X, F10.2, /,            &
           'Elapsed time (in ms):', 19X, F20.6)
 0090 FORMAT(I4, ';', F10.2, ';', F10.2, ';', F10.6, ';', &
           F20.6)
