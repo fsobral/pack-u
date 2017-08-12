@@ -39,7 +39,7 @@ To build Pack-U you need to
 
   1. Type
   
-        make packu
+          make packu
 
 The generated file is located in the path given by `BUILDDIR`
 variable, which is `build/` by default.
