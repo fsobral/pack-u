@@ -17,9 +17,9 @@ module packdat
   ! integer, parameter :: conttype(4) = (/ 2 ,  1,  1, 1 /)
 
   ! Maximum number of items for each type
-  integer, parameter :: maxitems(4) = (/ 121, 64, 64, 36 /)
+  ! integer, parameter :: maxitems(4) = (/ 121, 64, 64, 36 /)
   ! Type of container for each type of item
-  integer, parameter :: conttype(4) = (/   1,  1,  1,  1 /)
+  ! integer, parameter :: conttype(4) = (/   1,  1,  1,  1 /)
   ! Configuration file: containers' dimensions
   character(80), parameter :: c_filename = 'containers.txt'
   ! Configuration file: items' dimensions
@@ -59,6 +59,12 @@ module packdat
   ! Item's dimensions
   real(8), target, allocatable :: iLength_(:)
   real(8), target, allocatable :: iWidth_(:)
+
+  ! Maximum number of items in the largest Container
+  integer, allocatable :: maxItems(:)
+  ! Type of container for each type of item
+  integer, allocatable :: contType(:)
+
   ! Types of containers used
   integer, pointer :: cTypeUsed_(:)
   ! Index to the items in the container
@@ -566,6 +572,30 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
+  subroutine setMaxItems(itemType, itemL, itemW)
+
+    implicit none
+
+    ! SCALAR ARGUMENTS
+    integer, intent(in) :: itemType
+    real(kind=8), intent(in) :: itemL, itemW
+
+    ! LOCAL SCALARS
+    integer :: maxW, maxL
+
+    maxW = INT(cWidth_(1) / itemW)
+
+    maxL = INT(cLength_(1) / itemL)
+    
+    maxItems(itemType) = maxW * maxL
+
+    contType(itemType) = 1
+
+  end subroutine setMaxItems
+
+! ******************************************************************
+! ******************************************************************
+
   subroutine loadData(filename)
 
     implicit none
@@ -602,11 +632,17 @@ contains
 
     read(99, *) nTypes
 
-    allocate(types(nTypes), tL(nTypes), tW(nTypes))
+    ! TODO: test allocation error
+    allocate(types(nTypes), tL(nTypes), tW(nTypes), maxItems(nTypes), &
+             contType(nTypes))
 
+    ! Load items sizes and initializes the maximum number of items in
+    ! the largest container
     do t = 1, nTypes
 
        read(99, *) tL(t), tW(t)
+
+       call setMaxItems(t, tL(t), tW(t))
 
     end do
 
