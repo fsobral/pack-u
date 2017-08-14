@@ -109,12 +109,12 @@ Pack-U produces several files for output information:
   - `solXXX.asy`: Asymptote files for drawing solutions. Those files
     show the packing configuration for container *XXX*. In order to
     display each file, it is necessary to copy `packilib.asy` file to
-    the current directory and type
+    the current directory and call `asy`
 
         cp ../packlib.asy
         asy solXXX.asy
 
-    a PDF file `solXXX.pdf` will be generated. If a PDF file with
+    A PDF file `solXXX.pdf` will be generated. If a PDF file with
     **all** solutions is wanted, then the user can run
     `makepdf.sh` script, located at `scripts/` directory:
 
@@ -122,7 +122,7 @@ Pack-U produces several files for output information:
         ../scripts/makepdf.sh
 
     Be carefull, since this script removes all ASY files. File
-    `solution.pdf` is generated.
+    `solution.pdf` will be generated.
 
   - `stats.csv`: CSV file containing statistical information about the
     problem. It follows the pattern:
@@ -131,8 +131,26 @@ Pack-U produces several files for output information:
 
     where `NC` is the *number of containers*, `TCA` is the *total area
     of the containers*, `TIA` is the *total area of the items*, `WR` is
-    the percentage of *waste ratio* (100 * (TCA / TIA - 1)) and `CPU`
+    the *waste ratio* in percents (100 * (TCA / TIA - 1)) and `CPU`
     is the *CPU time* in miliseconds.
+
+The solution obtained for the above problem is
+
+    1,   70,    0,    0,    0,
+    1,   70,    0,    0,    0,
+    1,   70,    0,    0,    0,
+    1,   70,    0,    0,    0,
+    1,    0,    0,    0,   20,
+    1,    0,    0,    0,   20,
+    1,    0,    0,    0,   20,
+    1,    0,   17,    0,   10,
+    2,   20,    3,    0,    0,
+
+and the images generated are
+
+![][sol0] ![][sol1] ![][sol2]
+![][sol3] ![][sol4] ![][sol5]
+![][sol6] ![][sol7] ![][sol8]
 
 ## Solver configuration
 
@@ -155,5 +173,15 @@ executable is run:
     touch .silent
 
 [logo]: docs/images/packu-logo.png
+
+[sol0]: docs/images/sol0.png
+[sol1]: docs/images/sol1.png
+[sol2]: docs/images/sol2.png
+[sol3]: docs/images/sol3.png
+[sol4]: docs/images/sol4.png
+[sol5]: docs/images/sol5.png
+[sol6]: docs/images/sol6.png
+[sol7]: docs/images/sol7.png
+[sol8]: docs/images/sol8.png
 
 [algencan]: http://www.ime.usp.br/~egbirgin/tango
