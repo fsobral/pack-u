@@ -8,7 +8,7 @@
 
 rm sol0*.*
 
-./pack
+./packu
 
 asy sol0*.asy
 

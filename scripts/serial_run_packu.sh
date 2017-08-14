@@ -7,7 +7,7 @@
 #
 # It needs file 'packlib.asy' to draw the solution.
 
-DATA_FILES=dados-reais/pedidos
+DATA_FILES=../../dados-reais/pedidos
 
 OUTPUT_DIR='solutions'
 
@@ -15,19 +15,19 @@ OUTPUT_DIR='solutions'
 
 rm -fr ${OUTPUT_DIR}
 
-rm -fr stats_all.txt
+rm -fr stats_all.csv
 
 mkdir ${OUTPUT_DIR}
 
 
 for dataf in \
-    `find ${DATA_FILES} -type f -name '*.txt' -printf '%f\n'`; do
+    `find ${DATA_FILES} -type f -name '*.txt' -printf '%f\n' | sort`; do
 
     cp -f ${DATA_FILES}/${dataf} data.txt
 
     NAME=`echo ${dataf} | sed -s 's/[.].\+$//g'`
 
-    ./empacota.sh
+    ./run_packu.sh
 
     # ./pack > /dev/null
 
@@ -37,8 +37,8 @@ for dataf in \
 
     STATS=`cat stats.txt`
 
-    awk "{print ${NAME}\";\" \$0}" stats.txt >> stats_all.txt
+    awk "{print ${NAME}\";\" \$0}" stats.csv >> stats_all.csv
 
 done
 
-mv -vf stats_all.txt ${OUTPUT_DIR}/.
+mv -vf stats_all.csv ${OUTPUT_DIR}/.
