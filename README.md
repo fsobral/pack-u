@@ -127,12 +127,13 @@ Pack-U produces several files for output information:
   - `stats.csv`: CSV file containing statistical information about the
     problem. It follows the pattern:
 
-        NC, TCA, TIA, WR, CPU
+        NC, NI, TCA, TIA, WR, CPU
 
-    where `NC` is the *number of containers*, `TCA` is the *total area
-    of the containers*, `TIA` is the *total area of the items*, `WR` is
-    the *waste ratio* in percents (100 * (TCA / TIA - 1)) and `CPU`
-    is the *CPU time* in miliseconds.
+    where `NC` is the *number of containers*, `NI` is the *number of
+    items*, `TCA` is the *total area of the containers*, `TIA` is the
+    *total area of the items*, `WR` is the *waste ratio* in percents
+    (100 * (TCA / TIA - 1)) and `CPU` is the *CPU time* in
+    miliseconds.
 
 The solution obtained for the above problem is
 

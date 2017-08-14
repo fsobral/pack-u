@@ -140,28 +140,29 @@ contains
 
     end do
 
-    write(*,FMT=0080) nTContainers, tbArea, tiArea, &
-         (tbArea / tiArea - 1.0D0) * 100.0D0, &
+    write(*,FMT=0080) nTContainers, nTItems, tbArea,  &
+         tiArea, (tbArea / tiArea - 1.0D0) * 100.0D0, &
          elapsedTime * 1.0D+02
 
     ! Save STATS in file
 
     open(99, FILE=stats_filename)
     
-    write(99, FMT=0090) nTContainers, tbArea, tiArea, &
-         (tbArea / tiArea - 1.0D0) * 100.0D0,         &
+    write(99, FMT=0090) nTContainers, nTItems, tbArea, &
+         tiArea, (tbArea / tiArea - 1.0D0) * 100.0D0,  &
          elapsedTime * 1.0D+02
 
     close(99)
 
 0080 FORMAT(/, /, 'FINAL INFORMATION', /, 17('-'), /, /, &
           'Number of containers:', 35X, I4,/             &
+          'Number of items:', 37X, I7,/                  &
           'Total area:', 39X, F10.2, /                   &
           'Total item area:', 34X, F10.2, /,             &
-          'Waste ratio (%):', 34X, F10.2, /,            &
+          'Waste ratio (%):', 34X, F10.2, /,             &
           'Elapsed time (in ms):', 19X, F20.6)
-0090 FORMAT(I4, ',', F10.2, ',', F10.2, ',', F10.6, ',', &
-          F20.6)
+0090 FORMAT(I7, ',', I7, ',', F10.2, ',', F10.2, ',', &
+          F20.4, ',', F20.6)
 
   end subroutine printStats
 
