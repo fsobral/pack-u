@@ -27,15 +27,13 @@ for dataf in \
 
     NAME=`echo ${dataf} | sed -s 's/[.].\+$//g'`
 
-    ./run_packu.sh
+    #./run_packu.sh
 
-    # ./pack > /dev/null
+    ./packu > /dev/null
 
-    cp -vf solution.pdf ${OUTPUT_DIR}/${NAME}.pdf
+    #cp -f solution.pdf ${OUTPUT_DIR}/${NAME}.pdf
 
-    cp -vf solution.csv ${OUTPUT_DIR}/${NAME}.csv
-
-    STATS=`cat stats.txt`
+    #cp -f solution.csv ${OUTPUT_DIR}/${NAME}.csv
 
     awk "{print ${NAME}\";\" \$0}" stats.csv >> stats_all.csv
 
