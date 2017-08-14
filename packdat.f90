@@ -24,6 +24,8 @@ module packdat
   character(80), parameter :: c_filename = 'containers.txt'
   ! Configuration file: items' dimensions
   character(80), parameter :: i_filename = 'items.txt'
+  ! Statistics information file
+  character(80), parameter :: stats_filename = 'stats.csv'
 
 
   ! PRIVATE SCALARS
@@ -144,7 +146,7 @@ contains
 
     ! Save STATS in file
 
-    open(99, FILE='stats.txt')
+    open(99, FILE=stats_filename)
     
     write(99, FMT=0090) nTContainers, tbArea, tiArea, &
          (tbArea / tiArea - 1.0D0) * 100.0D0,         &
@@ -158,7 +160,7 @@ contains
           'Total item area:', 34X, F10.2, /,             &
           'Waste ratio (%):', 34X, F10.2, /,            &
           'Elapsed time (in ms):', 19X, F20.6)
-0090 FORMAT(I4, ';', F10.2, ';', F10.2, ';', F10.6, ';', &
+0090 FORMAT(I4, ',', F10.2, ',', F10.2, ',', F10.6, ',', &
           F20.6)
 
   end subroutine printStats
@@ -1070,14 +1072,14 @@ contains
 
     do i = 1, nTypes
 
-       write(99, FMT=9002, advance='no') i, counttItems(i)
+       write(99, FMT=9002, advance='no') counttItems(i)
 
     end do
 
     close(99)
     
 9001 FORMAT(I3,',')
-9002 FORMAT(I3,',',I5,',')
+9002 FORMAT(I5,',')
 
   end subroutine saveSol
 

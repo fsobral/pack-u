@@ -50,9 +50,9 @@ Pack-U needs 3 files to solve a packing problem:
 
   - `containers.txt`: the type of containers that can be used. The
     first line contains the **number** of different containers. Each
-    remaining line contains the **width** and **height** of each
-    container. The following example illustrates the case of 2
-    containers:
+    remaining line contains the **length** and **width** of each
+    container, from the largest area to the smallest one. The
+    following example illustrates the case of 2 containers:
 
 		2
 		40.0 30.0
@@ -63,31 +63,76 @@ Pack-U needs 3 files to solve a packing problem:
     contains a triple: **width**, **height** and **weight** (not used
     yet). The following example illustrates the case of 4 items:
 
-            4
-	    4 4 50
-	    5.7 5.7 200
-	    5.7 5.7 100
-	    7.5 7.5 500   
+        4
+        4 4 50
+        5.7 5.7 200
+        5.7 5.7 100
+        7.5 7.5 500   
 
   - `data.txt`: the **number items of each type** to be packed. It has
     the same number of lines as the number of type of items in the
     problem. In this example, a possible data file is:
 
-            300
-	    20
-	    0
-	    70
+        300
+        20
+        0
+        70
 
 Usually, files `containers.txt` and `items.txt` do not change very
 often, since they represent all the available items and
 containers. Each packing problem consists of a different `data.txt`
 file.
 
+**Important**: All the unit measures must be the same.
+
 ## Running
 
-After setting up your problem, to run Pack-U, simply type
+After setting up your problem, to run Pack-U, simply go to the `build`
+directory, copy the files that describe the problem and run it:
 
-    ./build/packu
+    cd build/
+    cp ../examples/toyprob/*.txt .
+    ./packu
+
+Pack-U produces several files for output information:
+
+  - `solution.csv`: a CSV file having the number of lines as the
+    number of used containers. Each line follows the pattern:
+
+        Container Type, #Item 1, #Item 2, ...,
+	
+    where *Container Type* is a number associated with the line in
+    `containers.txt` and *#Item 1* is the number of items of type 1
+    that will be packed into this container. The same for *#Item 2*,
+    *#Item 3*, etc.
+
+  - `solXXX.asy`: Asymptote files for drawing solutions. Those files
+    show the packing configuration for container *XXX*. In order to
+    display each file, it is necessary to copy `packilib.asy` file to
+    the current directory and type
+
+        cp ../packlib.asy
+        asy solXXX.asy
+
+    a PDF file `solXXX.pdf` will be generated. If a PDF file with
+    **all** solutions is wanted, then the user can run
+    `makepdf.sh` script, located at `scripts/` directory:
+
+        cp ../packlib.asy
+	../scripts/makepdf.sh
+
+    Be carefull, since this script removes all ASY files. File
+    `solution.pdf` is generated.
+
+  - `stats.csv`: CSV file containing statistical information about the
+    problem. It follows the pattern:
+
+        NC, TCA, TIA, WR, CPU
+
+    where `NC` is the *number of containers*, `TCA` is the *total area
+    of the containers*, `TIA` is the total area of the items, `WR` is
+    the percentage of *waste ratio* (100 * (TCA / TIA - 1)) and `CPU`
+    is the *CPU time* in miliseconds.
 
 ## Solver configuration
 
@@ -103,7 +148,7 @@ result. The default is `99999999` (i.e. *unlimited*), but, for online
 services and practical problems, it is reasonable to use small
 numbers, such as 10, 100.
 
-In order to avoid excessive output information, it is possible to
+In order to avoid excessive output information of ALGENCAN, it is possible to
 create an empty file `.silent` in the same directory where the
 executable is run:
 
