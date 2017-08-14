@@ -59,7 +59,7 @@ program algencanma
 
   numberOfSolutions = 0
 
-  if ( useReduction ) call reduction(numberOfSolutions)
+  if ( useReduction ) call reduction(numberOfSolutions, solfname)
 
   it = numberOfSolutions
 

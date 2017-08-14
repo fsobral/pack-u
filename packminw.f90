@@ -15,7 +15,7 @@ program algencanma
        f,nlpsupn,snorm,fbest,remArea,limItArea, area
 
   ! LOCAL ARRAYS
-  character(80)         :: filename
+  character(80)         :: filename, solfname
   character(len=15)     :: strtmp
   character(len=80)     :: specfnm,outputfnm,vparam(10)
   logical               :: coded(11)
@@ -31,6 +31,14 @@ program algencanma
 
   filename = 'data.txt'
 
+  solfname = 'solution.csv'
+
+  open(99, file=solfname)
+
+  write(99, *) ''
+
+  close(99)
+
   call loadData(filename)
 
   useReduction = .true.
@@ -39,7 +47,7 @@ program algencanma
 
   numberOfSolutions = 0
 
-  if ( useReduction ) call reduction(numberOfSolutions)
+  if ( useReduction ) call reduction(numberOfSolutions, solfname)
 
   it = numberOfSolutions
 

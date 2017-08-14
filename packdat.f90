@@ -286,17 +286,18 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine reduction(numberOfSolutions)
+  subroutine reduction(numberOfSolutions, csvoutput)
 
     ! TODO: Juntar itens com o tamanho igual
 
     implicit none
 
     ! SCALAR ARGUMENTS
+    character(80), intent(in) :: csvoutput
     integer, intent(out) :: numberOfSolutions
 
     ! LOCAL SCALARS
-    integer :: c, qot, curr_item, i
+    integer :: c, qot, curr_item, i, tmpIt
     character(80) :: filename
 
     ! LOCAL ARRAYS
@@ -353,6 +354,16 @@ contains
                            iLength(1), conttype(curr_item))
 
           cTypeUsed_(numberOfSolutions) = conttype(curr_item)
+
+          ! TODO: improve saveSol
+
+          tmpIt = nItems
+          
+          nItems = maxitems(curr_item)
+       
+          call saveSol(csvoutput)
+
+          nItems = tmpIt
 
           numberOfSolutions = numberOfSolutions + 1
 
