@@ -40,13 +40,17 @@ def getSolution(key):
 
         return None
 
-def toFile(sol, filename):
+def toFile(sol, solfilename, statsfilename):
 
-    with open(filename, 'w') as fp:
+    with open(solfilename, 'w') as fp:
 
         for s in sol['solution']:
 
             fp.write(s)
+
+    with open(statsfilename, 'w') as fp:
+
+        fp.write(sol['stats'].rstrip() + ' *\n' )
 
 def saveSolution(key, solfilename, statsfilename):
 
@@ -112,4 +116,4 @@ if __name__ == '__main__':
 
         print('Solution retrieved from cache.')
 
-        toFile(sol, 'solution.csv')
+        toFile(sol, 'solution.csv', 'stats.csv')

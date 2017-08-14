@@ -27,9 +27,14 @@ for dataf in \
 
     NAME=`echo ${dataf} | sed -s 's/[.].\+$//g'`
 
+    # Pure version with PDF generation
     #./run_packu.sh
 
-    ./packu > /dev/null
+    # Pure version without output
+    #./packu > /dev/null
+
+    # Cached version
+    ../scripts/run_and_cache.py > /dev/null
 
     #cp -f solution.pdf ${OUTPUT_DIR}/${NAME}.pdf
 
