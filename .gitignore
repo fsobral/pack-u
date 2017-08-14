@@ -1,6 +1,6 @@
-stats.txt
 *.mod
 *.o
+*.txt
 *~
 sol*.asy
 sol*.csv
