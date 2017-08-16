@@ -760,19 +760,23 @@ contains
 
     end do
 
-    iini = 1
+    call updateCurrItems(1, nTItems)
 
-    iend = nTItems
-
-    nItems = nTItems
-
-    iType   => iType_(iini:iend)
-
-    iNumber => iNumber_(iini:iend)
-
-    iLength => iLength_(iini:iend)
-
-    iWidth  =>  iWidth_(iini:iend)
+!!$    iini = 1
+!!$
+!!$    iend = nTItems
+!!$
+!!$    nItems = nTItems
+!!$
+!!$    ! Initialize common pointers
+!!$
+!!$    iType   => iType_(iini:iend)
+!!$
+!!$    iNumber => iNumber_(iini:iend)
+!!$
+!!$    iLength => iLength_(iini:iend)
+!!$
+!!$    iWidth  =>  iWidth_(iini:iend)
 
     deallocate(types, tL, tW)
 
@@ -790,17 +794,19 @@ contains
 
     write(*,*) 'Removing item', iNumber(nItems)
 
-    nItems = nItems - 1
+    call updateCurrItems(iini, iend - 1)
 
-    iend = iend - 1
-
-    iType   => iType_(iini:iend)
-
-    iNumber => iNumber_(iini:iend)
-
-    iWidth  => iWidth_(iini:iend)
-
-    iLength => iLength_(iini:iend)
+!!$    nItems = nItems - 1
+!!$
+!!$    iend = iend - 1
+!!$
+!!$    iType   => iType_(iini:iend)
+!!$
+!!$    iNumber => iNumber_(iini:iend)
+!!$
+!!$    iWidth  => iWidth_(iini:iend)
+!!$
+!!$    iLength => iLength_(iini:iend)
 
   end subroutine removeAppendedBox
 
@@ -856,17 +862,19 @@ contains
 
        call swap(x, iWidth_, iLength_, iType_, iNumber_, item, iend + 1)
 
-       nItems = nItems + 1
+       call updateCurrItems(iini, iend + 1)
 
-       iend = iend + 1
-       
-       iType   => iType_(iini:iend)
-       
-       iNumber => iNumber_(iini:iend)
-       
-       iWidth  => iWidth_(iini:iend)
-       
-       iLength => iLength_(iini:iend)
+!!$       nItems = nItems + 1
+!!$
+!!$       iend = iend + 1
+!!$       
+!!$       iType   => iType_(iini:iend)
+!!$       
+!!$       iNumber => iNumber_(iini:iend)
+!!$       
+!!$       iWidth  => iWidth_(iini:iend)
+!!$       
+!!$       iLength => iLength_(iini:iend)
 
        !write(*,*), iNumber_(item), iNumber(nItems)
 
@@ -1032,17 +1040,19 @@ contains
 
     ! Update the number of items and selected items
 
-    nItems = pos
+    call updateCurrItems(iini, iini + pos - 1)
 
-    iend = iini + nItems - 1
-
-    iType   => iType_(iini:iend)
-
-    iNumber => iNumber_(iini:iend)
-
-    iWidth  => iWidth_(iini:iend)
-
-    iLength => iLength_(iini:iend)
+!!$    nItems = pos
+!!$
+!!$    iend = iini + nItems - 1
+!!$
+!!$    iType   => iType_(iini:iend)
+!!$
+!!$    iNumber => iNumber_(iini:iend)
+!!$
+!!$    iWidth  => iWidth_(iini:iend)
+!!$
+!!$    iLength => iLength_(iini:iend)
 
   end subroutine extractBoxes
 
@@ -1071,9 +1081,40 @@ contains
 
     end if
 
-    iini = iini + nit
+!!$    iini = iini + nit
+!!$
+!!$    iend = nTItems
+!!$
+!!$    nItems = iend - iini + 1
+!!$
+!!$    iType   => iType_(iini:iend)
+!!$
+!!$    iNumber => iNumber_(iini:iend)
+!!$
+!!$    iWidth  => iWidth_(iini:iend)
+!!$
+!!$    iLength => iLength_(iini:iend)
 
-    iend = nTItems
+    call updateCurrItems(iini + nit, nTItems)
+
+  end subroutine removeItems
+  
+! ******************************************************************
+! ******************************************************************
+
+  subroutine updateCurrItems(niini, niend)
+
+    ! This subroutine updates which items are currently being
+    ! considered for optimization and packing.
+
+    implicit none
+
+    ! SCALAR ARGUMENTS
+    integer, intent(in) :: niini, niend
+
+    iini = niini
+
+    iend = niend
 
     nItems = iend - iini + 1
 
@@ -1085,8 +1126,8 @@ contains
 
     iLength => iLength_(iini:iend)
 
-  end subroutine removeItems
-  
+  end subroutine updateCurrItems
+
 ! ******************************************************************
 ! ******************************************************************
 
