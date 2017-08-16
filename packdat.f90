@@ -11,22 +11,12 @@ module packdat
 
   ! PRIVATE PARAMETERS
 
-  ! Maximum number of items for each type
-  ! integer, parameter :: maxitems(4) = (/ 66, 64, 36, 36 /)
-  ! Type of container for each type of item
-  ! integer, parameter :: conttype(4) = (/ 2 ,  1,  1, 1 /)
-
-  ! Maximum number of items for each type
-  ! integer, parameter :: maxitems(4) = (/ 121, 64, 64, 36 /)
-  ! Type of container for each type of item
-  ! integer, parameter :: conttype(4) = (/   1,  1,  1,  1 /)
   ! Configuration file: containers' dimensions
   character(80), parameter :: c_filename = 'containers.txt'
   ! Configuration file: items' dimensions
   character(80), parameter :: i_filename = 'items.txt'
   ! Statistics information file
   character(80), parameter :: stats_filename = 'stats.csv'
-
 
   ! PRIVATE SCALARS
 
@@ -93,6 +83,9 @@ contains
 
   subroutine resetPacking()
 
+    ! This subroutine cancels the current packing and allows a whole
+    ! new packing to start using the available items.
+
     call removeItems(0)
 
   end subroutine resetPacking
@@ -102,6 +95,11 @@ contains
 
   function remainingItems()
 
+    ! This function return the number of remaining items to be packed.
+
+    implicit none
+
+    ! RETURN
     integer :: remainingItems
 
     remainingItems = nTItems - iend
@@ -112,6 +110,9 @@ contains
 ! ******************************************************************
 
   subroutine printStats(elapsedTime)
+
+    ! This subroutine prints final statistics on the screen and also
+    ! in an output file.
 
     implicit none
 
@@ -289,7 +290,12 @@ contains
 
   subroutine reduction(numberOfSolutions, csvoutput)
 
-    ! TODO: Juntar itens com o tamanho igual
+    ! This subroutine applies the reduction heuristic. It uses the
+    ! values given by vector 'maxItems' to quickly eliminates items of
+    ! the same type.
+
+    ! TODO: It is a good idea to identify when different items have
+    ! the same sizes.
 
     implicit none
 
@@ -370,6 +376,8 @@ contains
 
        end do
 
+       ! Update the number of containers
+
        nTContainers = numberOfSolutions - 1
 
        ! Remove items
@@ -386,6 +394,20 @@ contains
   subroutine drawPattern(filename, nit, itwid, itlen, container)
 
     ! This subroutine draws a pre-optimized pattern for the given item
+    ! type. This pattern was found by the heuristic procedure of
+    ! subroutine 'reduction'. It is an easy way to set up the current
+    ! solution data and call subroutine 'drawSol'.
+    !
+    ! filename: the output filename
+    !
+    ! nit: number of items of the current type
+    !
+    ! itwid: item's width
+    !
+    ! itlen: item's length
+    !
+    ! container: type of the container onto which the items will be
+    !            packed
 
     implicit none
 
@@ -489,6 +511,19 @@ contains
 
   subroutine initialpoint(x, s, strip)
 
+    ! This subroutine sets up an random initial position of the items,
+    ! in order to solve a non-linear programming problem.
+    !
+    ! x: On output, it contains the position of the items to be
+    !    packed
+    !
+    ! s: the seed to be used to call the random intrinsic functions
+    !
+    ! strip: if '.true.', the problem of minimizing a strip is
+    !        considered, which means that the last position of vector
+    !        'x' is the length of the strip and also has to be
+    !        randomly initialized.
+
     implicit none
 
     ! SCALAR ARGUMENTS
@@ -519,7 +554,9 @@ contains
 
     deallocate(seed)
 
-    ! Randomly select the order of the items
+    ! Select the items with the largest area first.  If a random
+    ! initial point is wanted, then comment this procedure and
+    ! uncomment the random procedure below.
 
     do i = 1, nItems
 
@@ -527,6 +564,8 @@ contains
 
     end do
 
+!!$    ! Randomly select the order of the items
+!!$
 !!$    do i = 1, nItems
 !!$
 !!$       call random_number(rnumber)
@@ -588,6 +627,11 @@ contains
 
   subroutine setMaxItems(itemType, itemL, itemW)
 
+    ! This subroutine calculates the maximum number of items of type
+    ! 'itemType' that can be packed onto the largest container. It
+    ! automatically initializes internal vectors 'maxItems' and
+    ! 'contType'.
+
     implicit none
 
     ! SCALAR ARGUMENTS
@@ -611,6 +655,12 @@ contains
 ! ******************************************************************
 
   subroutine loadData(filename)
+
+    ! This subroutine loads the problem's data and initializes all the
+    ! structure of the packing problem.
+    !
+    ! filename: the name of the data file, which contains the number
+    !           of each type of item to be packed
 
     implicit none
 
@@ -678,12 +728,15 @@ contains
 
     end do
 
+    close(99)
+
     ! Initialize the number of used containers
 
     nTContainers = 0
 
     ! Create all items
 
+    ! TODO: test allocation error
     allocate(iType_(nTItems), iLength_(nTItems), iWidth_(nTItems), &
              iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems))
 
@@ -722,8 +775,6 @@ contains
     iWidth  =>  iWidth_(iini:iend)
 
     deallocate(types, tL, tW)
-
-    close(99)
 
   end subroutine loadData
 
@@ -789,8 +840,6 @@ contains
 
        if ( cArea .lt. min(lItArea, rArea) .and. cArea .gt. area ) then
 
-          !write(*,*) cArea, lItArea, rArea, iNumber_(i)
-
           area = cArea
 
           item = i
@@ -830,7 +879,7 @@ contains
 
   subroutine dswap(v, i, j)
 
-    ! Performs a swap in a real vector
+    ! Performs a swap of positions 'i' and 'j' in a real vector
 
     implicit none
 
@@ -856,7 +905,7 @@ contains
 
   subroutine iswap(v, i, j)
 
-    ! Performs a swap in a real vector
+    ! Performs a swap of positions 'i' and 'j' in a real vector
 
     implicit none
 
@@ -883,7 +932,7 @@ contains
   subroutine swap(x, vw, vl, vt, vn, it1, it2)
 
     ! Swaps positions related to items it1 and it2 in real vectors vw,
-    ! vl and integer vector vt, vn
+    ! vl and integer vectors vt, vn
 
     implicit none
 
@@ -923,7 +972,8 @@ contains
   subroutine extractBoxes(x)
 
     ! This subroutine select a subset of items to be fit inside the
-    ! current container.
+    ! current container. This subroutine should be called only in the
+    ! 'strip' problem, but can be used for general purposes.
 
     implicit none
 
@@ -935,6 +985,8 @@ contains
     real(8) :: tmp
 
     pos = 1
+
+    ! Select items
 
     write(*,*) 'Selected items:'
 
@@ -951,6 +1003,8 @@ contains
        end if 
 
     end do
+
+    ! Remove overlapped items, if any
 
     pos = pos - 1
 
@@ -997,7 +1051,7 @@ contains
 
   subroutine removeItems(nit)
 
-    ! This subroutine remove the first 'nit' items. In practice, this
+    ! This subroutine removes the first 'nit' items. In practice, this
     ! means that it shifts 'nit' positions in all the inner vectors
     ! and updates the inner limits.
 
@@ -1037,6 +1091,9 @@ contains
 ! ******************************************************************
 
   subroutine removeBoxes()
+
+    ! This subroutine remove the items packed in the current
+    ! container.
 
     implicit none
 
@@ -1100,6 +1157,10 @@ contains
 
   subroutine drawSol(x, output, strip)
 
+    ! This subroutine creates a .ASY file in order to draw the
+    ! solution. If 'strip = .true.' then the strip problem is being
+    ! considered and the last coordinate of 'x' is the strip's length.
+
     implicit none
 
     ! SCALAR ARGUMENTS
@@ -1114,6 +1175,8 @@ contains
     ! LOCAL SCALARS
     integer :: i
     real(8) :: scale
+
+    ! Try to find a reasonable scale for drawing
 
     scale = max(1.0D-4, min(1.0D0, 30.0D0 / maxval(x(1:nItems))))
 
