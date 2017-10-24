@@ -5,7 +5,7 @@ module containers
   ! it. It also provides some utility subroutines for printing, saving
   ! and working with containers.
   
-  use items
+  use items, only : Item
   
   implicit none
 
@@ -27,6 +27,56 @@ module containers
   
 contains
 
+! ******************************************************************
+! ******************************************************************
+
+  function getCArea(c)
+
+    ! This function returns the area of the container.
+
+    implicit none
+
+    ! SCALAR ARGUMENT
+    type(Container), intent(in) :: c
+
+    ! RETURN
+    real(8) :: getCArea
+
+    getCArea = c%length * c%width
+
+  end function getCArea
+
+! ******************************************************************
+! ******************************************************************
+
+  function getCOArea(c)
+
+    ! This function return the area of the container that is being
+    ! occupied by items.
+    
+    use items, only : getIArea
+    
+    implicit none
+
+    ! SCALAR ARGUMENT
+    type(Container), intent(in) :: c
+
+    ! LOCAL SCALAR
+    integer :: i
+    
+    ! RETURN
+    real(8) :: getCOArea
+
+    getCOArea = 0.0D0
+
+    do i = 1, c%nItems
+
+       getCOArea = getCOArea + getIArea(c%pItems(i))
+
+    end do
+
+  end function getCOArea
+  
 ! ******************************************************************
 ! ******************************************************************
 

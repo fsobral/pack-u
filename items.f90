@@ -122,5 +122,24 @@ contains
     end do
     
   end subroutine toVector
-  
+
+! ******************************************************************
+! ******************************************************************
+
+  function getIArea(it)
+
+    ! This function return the area of item 'it'.
+
+    implicit none
+
+    ! SCALAR ARGUMENT
+    type(Item), intent(in) :: it
+
+    ! RETURN
+    real(8) :: getIArea
+
+    getIArea = it%length * it%width
+
+  end function getIArea
+
 end module items
