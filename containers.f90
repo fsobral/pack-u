@@ -30,6 +30,53 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
+  function createContainerFromSol(type, len, wid, nItems, v)
+
+    ! This function returns a Container with the given solution.
+
+    implicit none
+    
+    ! SCALAR ARGUMENTS
+    integer :: type, nItems
+    real(8) :: len, wid
+
+    ! ARRAY ARGUMENTS
+    type(Item) :: v(nItems)
+
+    intent(in) :: type, len, wid, nItems, v
+    
+    ! LOCAL SCALARS
+    integer :: i
+    
+    ! LOCAL ARRAYS
+    type(Item), pointer :: pItems(:)
+    
+    ! RETURN
+    type(Container), target :: createContainerFromSol
+
+    createContainerFromSol%type = type
+
+    createContainerFromSol%length = len
+
+    createContainerFromSol%width = wid
+
+    createContainerFromSol%nItems = nItems
+
+    allocate(createContainerFromSol%pItems(nItems))
+
+    pItems => createContainerFromSol%pItems
+    
+    do i = 1, nItems
+
+       pItems(i) = v(i)
+
+    end do
+
+  end function createContainerFromSol
+  
+! ******************************************************************
+! ******************************************************************
+
   function getCArea(c)
 
     ! This function returns the area of the container.
