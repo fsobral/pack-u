@@ -7,12 +7,21 @@ module items
   
   type Item
 
-     integer :: number, type
+     ! Item identification
+     integer :: number
+     ! Item type
+     integer :: type
+     ! Item's dimensions
      real(8) :: length, width
+     ! Item position
+     real(8) :: x, y
      
   end type Item
 
 contains
+
+  ! ***********************************************************
+  ! ***********************************************************
 
   subroutine createSameItems(n, type, len, wid, nStart, v)
 
@@ -30,12 +39,15 @@ contains
     ! ARRAY ARGUMENTS
     type(Item) :: v(n)
 
+    intent(in)  :: n, type, nStart, len, wid
+    intent(out) :: v
+    
     ! LOCAL SCALARS
     integer :: i
 
     do i = 1, n
 
-       v(i) = Item(nStart + i - 1, type, len, wid)
+       v(i) = Item(nStart + i - 1, type, len, wid, 0.0D0, 0.0D0)
        
     end do
     
