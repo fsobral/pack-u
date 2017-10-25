@@ -4,6 +4,9 @@ PACKPROBLEM = packminc
 
 BUILDDIR = build
 
+lib: packdat.o items.o containers.o
+	ar crv libpacku.a $^
+
 packu: $(PACKPROBLEM).o packdat.o
 	gfortran $^ -L$(TANGOLIB) -lalgencan -o $@
 	mkdir -p $(BUILDDIR)
