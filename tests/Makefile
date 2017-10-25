@@ -33,17 +33,30 @@ UNITTEST = unit_tests.bin
 FRUIT_CODE = fruit.f90
 FRUIT_GEN_CODE = fruit_basket_gen.f90 fruit_driver_gen.f90
 
+
 run: $(UNITTEST)
 	./$(UNITTEST)
 
 $(UNITTEST): $(FRUIT_CODE) $(TESTS_CODE) $(FRUIT_GEN_CODE)
-	$(FC) $(FOPT) -I$(BUILD) $^ -o $@
+	$(FC) $(FOPT) -I$(BUILD) -L$(BUILD) $^ -lpacku -o $@
 
 fruit_basket_gen.f90 : $(TESTS_CODE)
 	ruby fruit_generator.rb
 
 fruit_driver_gen.f90 : $(TESTS_CODE)
 	ruby fruit_generator.rb
+
+# %_test.o: %_test.f90
+# 	$(FC) $(FOPT) -I$(BUILD) -c $<
+
+# fruit.o: fruit.f90
+# 	$(FC) $(FOPT) $< -c
+
+# fruit_basket_gen.o: fruit_basket_gen.f90
+# 	$(FC) $(FOPT) $< -c
+
+# fruit_driver_gen.o: fruit_driver_gen.f90
+# 	$(FC) $(FOPT) -c $<
 
 clean : 
 	rm -f *.o *.mod *.obj *.bin
