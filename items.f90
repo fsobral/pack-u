@@ -18,6 +18,8 @@ module items
      
   end type Item
 
+  public
+  
 contains
 
 ! ******************************************************************
@@ -85,7 +87,7 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine toVector(nItems, v, n, x)
+  subroutine toVector(nItems, v, n, x, inform)
 
     ! This subroutine converts an array of items to a vector of x and
     ! y positions.
@@ -94,13 +96,14 @@ contains
     
     ! SCALAR ARGUMENTS
     integer :: nItems, n
+    integer, optional :: inform
 
     ! ARRAY ARGUMENTS
     type(Item) :: v(nItems)
     real(8)    :: x(n)
 
     intent(in)  :: nItems, v, n
-    intent(out) :: x
+    intent(out) :: x, inform
 
     ! LOCAL SCALARS
     integer :: i
@@ -109,6 +112,8 @@ contains
 
        write(*, *) 'ERROR: mismatching dimensions in toVector(..)!'
 
+       if (present(inform)) inform = 1
+       
        return
 
     end if
@@ -120,6 +125,8 @@ contains
        x(2 * i)     = v(i)%y
 
     end do
+
+    if (present(inform)) inform = 0
     
   end subroutine toVector
 
