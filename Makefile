@@ -21,6 +21,12 @@ packminw.o: packminw.f90 packdat.mod
 packdat.mod: packdat.f90
 	gfortran -c $^
 
+items.mod: items.f90
+	gfortran -c $^
+
+containers.mod: containers.f90 items.mod 
+	gfortran -c $<
+
 clean:
 	rm -f *.mod *.o solution.csv solution.pdf \
 	sol[0-9][0-9][0-9].* build/*
