@@ -67,6 +67,9 @@ module packdat
   ! Pointer to current item's dimensions
   real(8), pointer :: iLength(:), iWidth(:)
 
+  !Id for containers and items
+  integer, allocatable :: cId(:), iId(:)
+
   private
 
   public :: iLength, iWidth, cLength, cWidth, nItems, nTItems,    &
@@ -74,7 +77,7 @@ module packdat
             initialpoint, loadData, drawSol, extractBoxes,        &
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
-            saveSol
+            saveSol,cId,iId
 
 contains
 
@@ -678,11 +681,11 @@ contains
 
     read(99, *) nContainers
 
-    allocate(clength_(nContainers), cWidth_(nContainers))
+    allocate(clength_(nContainers), cWidth_(nContainers),cId(nContainers))
 
     do i = 1, nContainers
 
-       read(99, *) cLength_(i), cWidth_(i)
+       read(99, *) cLength_(i), cWidth_(i), cId(i)
 
     end do
 
@@ -698,13 +701,16 @@ contains
 
     ! TODO: test allocation error
     allocate(types(nTypes), tL(nTypes), tW(nTypes), maxItems(nTypes), &
-             contType(nTypes))
+             contType(nTypes),iId(nTypes))
 
     ! Load items sizes and initializes the maximum number of items in
     ! the largest container
+    ! We inserted the iId input here. Note that the weight option 
+    ! was excluded
+
     do t = 1, nTypes
 
-       read(99, *) tL(t), tW(t)
+       read(99, *) tL(t), tW(t),iId(t)
 
        call setMaxItems(t, tL(t), tW(t))
 
@@ -762,6 +768,28 @@ contains
 
     call updateCurrItems(1, nTItems)
 
+! For testing if the input was read we create a file called testing.txt 
+! TODO : test setup error
+
+open(10,FILE='testing.txt')
+
+write(10,*) 'Container id'
+
+    do i =1, nContainers
+
+      write(10,*) cId(i)
+    
+    end do
+    
+    write(10,*) 'Item Id'
+      
+    do i=1, nTypes
+
+        write(10,*) iId(i)
+
+    end do
+
+    close(10)
 !!$    iini = 1
 !!$
 !!$    iend = nTItems
