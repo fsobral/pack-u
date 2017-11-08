@@ -11,6 +11,8 @@ module items
      integer :: number
      ! Item type
      integer :: type
+     ! Item class
+     integer :: class
      ! Item's dimensions
      real(8) :: length, width
      ! Item position
@@ -25,7 +27,7 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine createSameItems(n, type, len, wid, nStart, v)
+  subroutine createSameItems(n, type, class, len, wid, nStart, v)
 
     ! This subroutine populates a (previously allocated) vector 'v'
     ! with 'n' items of type 'type' and given dimensions 'len' and
@@ -35,13 +37,13 @@ contains
     implicit none
     
     ! SCALAR ARGUMENTS
-    integer :: n, type, nStart
+    integer :: n, type, class, nStart
     real(8) :: len, wid
     
     ! ARRAY ARGUMENTS
     type(Item) :: v(n)
 
-    intent(in)  :: n, type, nStart, len, wid
+    intent(in)  :: n, type, class, nStart, len, wid
     intent(out) :: v
     
     ! LOCAL SCALARS
@@ -49,7 +51,8 @@ contains
 
     do i = 1, n
 
-       v(i) = Item(nStart + i - 1, type, len, wid, 0.0D0, 0.0D0)
+       v(i) = Item(nStart + i - 1, type, class, len, wid, 0.0D0, &
+                   0.0D0)
        
     end do
     

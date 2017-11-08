@@ -17,11 +17,13 @@ contains
 
     type(Item) :: it
 
-    it = Item(10, 1, 1.5D0, 5.0D0, 1.0D0, 2.0D0)
+    it = Item(10, 1, 0, 1.5D0, 5.0D0, 1.0D0, 2.0D0)
 
     call assert_equals(10, it%number)
 
     call assert_equals(1, it%type)
+
+    call assert_equals(0, it%class)
 
     call assert_equals(1.5D0, it%length)
 
@@ -53,7 +55,7 @@ contains
 
     allocate(vItems(n))
 
-    call createSameItems(n, 3, 1.5D0, 3.0D0, 17, vItems)
+    call createSameItems(n, 3, 0, 1.5D0, 3.0D0, 17, vItems)
 
     do i = 1, n
 
@@ -62,6 +64,8 @@ contains
        call assert_equals(17 + i - 1, it%number)
 
        call assert_equals(3, it%type)
+
+       call assert_equals(0, it%class)
 
        call assert_equals(1.5D0, it%length)
 
@@ -90,7 +94,7 @@ contains
     !LOCAL ARRAYS
     type(Item) :: vItems(3)
 
-    call createSameItems(3, 1, 1.5D0, 3.0D0, 1, vItems)
+    call createSameItems(3, 1, 1, 1.5D0, 3.0D0, 1, vItems)
 
     it1 = vItems(1)
 
@@ -127,7 +131,7 @@ contains
 
     n = 4
     
-    call createSameItems(n, 2, 5.0D0, 3.0D0, 1, vItems)
+    call createSameItems(n, 2, 0, 5.0D0, 3.0D0, 1, vItems)
 
     call toVector(n, vItems, 2 * n, x, inform)
 
@@ -164,7 +168,7 @@ contains
 
     n = 4
     
-    call createSameItems(n, 2, 5.0D0, 3.0D0, 1, vItems)
+    call createSameItems(n, 2, 0, 5.0D0, 3.0D0, 1, vItems)
 
     call toVector(n, vItems, n, x, inform)
 
@@ -182,7 +186,7 @@ contains
     ! LOCAL SCALARS
     type(Item) :: it
 
-    it = Item(1, 1, 10.0D0, 2.0D0, 0.0D0, 0.0D0)
+    it = Item(1, 1, 1, 10.0D0, 2.0D0, 0.0D0, 0.0D0)
 
     call assert_equals(10.0D0 * 2.0D0, getIArea(it))
     
@@ -205,6 +209,8 @@ contains
     call assert_equals(it1%number, it2%number)
 
     call assert_equals(it1%type, it2%type)
+
+    call assert_equals(it1%class, it2%class)
 
     call assert_equals(it1%length, it2%length)
 

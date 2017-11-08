@@ -125,7 +125,7 @@ contains
 
     do i = 1, nit
 
-       it(i) = Item(0, i, 10.0D0 + i, 20.0D0 + i, 0.0D0, 0.0D0)
+       it(i) = Item(0, i, 0, 10.0D0 + i, 20.0D0 + i, 0.0D0, 0.0D0)
 
     end do
 
