@@ -24,8 +24,40 @@ module containers
      type(Item), allocatable :: pItems(:)
      
   end type Container
+
+  public
   
 contains
+
+! ******************************************************************
+! ******************************************************************
+
+  function emptyContainer(type, len, wid)
+
+    ! This function returns an empty Container
+
+    implicit none
+    
+    ! SCALAR ARGUMENTS
+    integer :: type
+    real(8) :: len, wid
+
+    intent(in) :: type, len, wid
+        
+    ! RETURN
+    type(Container) :: emptyContainer
+
+    emptyContainer%type = type
+
+    emptyContainer%length = len
+
+    emptyContainer%width = wid
+
+    emptyContainer%nItems = 0
+
+    allocate(emptyContainer%pItems(0))
+
+  end function emptyContainer
 
 ! ******************************************************************
 ! ******************************************************************

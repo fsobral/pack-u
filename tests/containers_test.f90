@@ -5,7 +5,28 @@ module containers_test
   implicit none
   
 contains
+
+  subroutine test_empty_container
+
+    use containers
+
+    type(Container) :: c
+
+    c = emptyContainer(1, 10.0D0, 5.0D0)
+
+    call assert_equals(1, c%type)
+
+    call assert_equals(10.0D0, c%length)
+
+    call assert_equals(5.0D0, c%width)
+
+    call assert_equals(0, c%nItems)
+    
+  end subroutine test_empty_container
   
+! ******************************************************************
+! ******************************************************************
+
   subroutine test_simple_container_no_items
 
     use containers
