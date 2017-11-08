@@ -25,7 +25,9 @@ module containers
      
   end type Container
 
-  public
+  private
+
+  public Container, emptyContainer, createContainerFromSol
   
 contains
 
