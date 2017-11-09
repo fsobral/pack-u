@@ -102,17 +102,22 @@ contains
   subroutine test_load_data
 
     use packdat, only : loadData, nTItems, nItems, iLength, &
-         iWidth, iId
+         iWidth, iId, nContainers, setCurrContainer, cLength, &
+         cWidth, cId, shutdown
 
     use items, only : ItemType
 
     use containers, only : Container, emptyContainer
 
+    implicit none
+
     integer, parameter :: nit = 4, ncont = 3
     
     character(80) :: filename
 
-    integer :: i, totalIt
+    integer :: i, j, totalIt, countType
+
+    real(8) :: prevCArea, currCArea
     
     integer :: qIt(4)
 
@@ -120,8 +125,6 @@ contains
 
     type(Container) :: cont(ncont)
     
-    call setSeed(543210)
-
     do i = 1, nit
 
        it(i) = ItemType(i, 17, 10.0D0 + i, 20.0D0 + i)
@@ -130,17 +133,29 @@ contains
 
     do i = 1, ncont
 
-       cont(i) = emptyContainer(i, 100.0D0 + i, 200.0D0 - i)
+       cont(i) = emptyContainer(i, 100.0D0 + i, 200.0D0 - 2 * i)
 
     end do
 
     filename = "data.txt"
 
+    ! Test 1
+    
     qIt = (/10, 0, 0, 0/)
     
-    call createFiles(it, nit, cont, ncont, qIt)
+    call createFiles(it, nit, cont, 1, qIt)
     
     call loadData(filename)
+    
+
+    call assert_equals(1, nContainers)
+
+    call setCurrContainer(1)
+
+    call assert_equals(cont(1)%length, cLength)
+
+    call assert_equals(cont(1)%width, cWidth)
+    
 
     totalIt = sum(qIt)
     
@@ -163,6 +178,61 @@ contains
        call assert_equals(it(1)%class, iId(i))
 
     end do
+
+    ! Test 2
+
+    call shutdown()
+    
+    qIt = (/10, 0, 20, 30/)
+    
+    call createFiles(it, nit, cont, ncont, qIt)
+    
+    call loadData(filename)
+
+
+    call assert_equals(ncont, nContainers)
+
+    prevCArea = 0.0D0
+    
+    do i = 1, ncont
+
+       call setCurrContainer(i)
+       
+       currCArea = cLength * cWidth
+       
+       call assert_true( prevCArea .le. currCArea )
+
+       prevCArea = currCArea
+
+    end do    
+
+    totalIt = sum(qIt)
+
+    call assert_equals(totalIt, nTItems)
+
+    call assert_equals(nItems, nTItems)
+
+    call assert_equals(totalIt, size(iLength))
+
+    call assert_equals(totalIt, size(iWidth))
+
+    call assert_equals(totalIt, size(iId))
+
+    do i = 1, nit
+
+       countType = 0
+       
+       do j = 1, totalIt
+
+          if ( iLength(j) .eq. it(i)%length .and. &
+               iWidth(j) .eq. it(i)%width ) countType = countType + 1
+
+       end do
+
+       call assert_equals(qIt(i), countType)
+
+    end do
+          
 
   end subroutine test_load_data
 
