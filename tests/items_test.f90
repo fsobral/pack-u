@@ -11,23 +11,21 @@ contains
 
   subroutine test_create_simple_item
 
-    use items
+    use items, only : Item, ItemType
 
     implicit none
 
     type(Item) :: it
 
-    it = Item(10, 1, 0, 1.5D0, 5.0D0, 1.0D0, 2.0D0)
+    type(ItemType), target :: itp
+
+    itp = ItemType(1, 0, 1.5D0, 5.0D0)
+
+    it = Item(10, itp, 1.0D0, 2.0D0)
 
     call assert_equals(10, it%number)
 
-    call assert_equals(1, it%type)
-
-    call assert_equals(0, it%class)
-
-    call assert_equals(1.5D0, it%length)
-
-    call assert_equals(5.0D0, it%width)
+    call assert_item_type_equals(itp, it%type)
 
     call assert_equals(1.0D0, it%x)
 
@@ -40,22 +38,25 @@ contains
 
   subroutine test_create_same_items
 
-    use items, only : Item, createSameItems
+    use items, only : Item, ItemType, createSameItems
 
     implicit none
 
     ! LOCAL SCALARS
     integer :: i, n
     type(Item) :: it
+    type(ItemType), target :: itp
 
     !LOCAL ARRAYS
     type(Item), allocatable :: vItems(:)
 
+    itp = ItemType(5, 0, 1.5D0, 3.0D0)
+    
     n = 15
-
+    
     allocate(vItems(n))
 
-    call createSameItems(n, 3, 0, 1.5D0, 3.0D0, 17, vItems)
+    call createSameItems(n, itp, 17, vItems)
 
     do i = 1, n
 
@@ -63,13 +64,7 @@ contains
        
        call assert_equals(17 + i - 1, it%number)
 
-       call assert_equals(3, it%type)
-
-       call assert_equals(0, it%class)
-
-       call assert_equals(1.5D0, it%length)
-
-       call assert_equals(3.0D0, it%width)
+       call assert_item_type_equals(itp, it%type)
 
        call assert_equals(0.0D0, it%x)
 
@@ -84,7 +79,7 @@ contains
 
   subroutine test_swap_items
 
-    use items, only : Item, createSameItems, swapItems
+    use items, only : Item, ItemType, createSameItems, swapItems
 
     implicit none
 
@@ -93,8 +88,11 @@ contains
 
     !LOCAL ARRAYS
     type(Item) :: vItems(3)
+    type(ItemType), target :: itp
 
-    call createSameItems(3, 1, 1, 1.5D0, 3.0D0, 1, vItems)
+    itp = ItemType(2, 1, 1.5D0, 3.0D0)
+
+    call createSameItems(3, itp, 1, vItems)
 
     it1 = vItems(1)
 
@@ -117,21 +115,24 @@ contains
 
   subroutine test_to_vector
 
-    use items, only : Item, toVector, createSameItems
+    use items, only : Item, ItemType, toVector, createSameItems
 
     implicit none
 
     ! LOCAL SCALARS
     integer i, n, inform
     type(Item) :: it
+    type(ItemType), target :: itp
     
     ! LOCAL ARRAYS
     type(Item) :: vItems(4)
     real(8) :: x(2 * 4)
 
+    itp = ItemType(1, 0, 5.0D0, 3.0D0)
+    
     n = 4
     
-    call createSameItems(n, 2, 0, 5.0D0, 3.0D0, 1, vItems)
+    call createSameItems(n, itp, 1, vItems)
 
     call toVector(n, vItems, 2 * n, x, inform)
 
@@ -154,21 +155,24 @@ contains
 
   subroutine test_to_vector_wrong_size
 
-    use items, only : Item, toVector, createSameItems
+    use items, only : Item, ItemType, toVector, createSameItems
 
     implicit none
 
     ! LOCAL SCALARS
     integer i, n, inform
     type(Item) :: it
+    type(ItemType), target :: itp
     
     ! LOCAL ARRAYS
     type(Item) :: vItems(4)
     real(8) :: x(4)
 
+    itp = ItemType(3, 0, 5.0D0, 3.0D0)
+    
     n = 4
     
-    call createSameItems(n, 2, 0, 5.0D0, 3.0D0, 1, vItems)
+    call createSameItems(n, itp, 1, vItems)
 
     call toVector(n, vItems, n, x, inform)
 
@@ -181,12 +185,15 @@ contains
 
   subroutine test_area
 
-    use items, only : Item, getIArea
+    use items, only : Item, ItemType, getIArea
 
     ! LOCAL SCALARS
     type(Item) :: it
+    type(ItemType), target :: itp
 
-    it = Item(1, 1, 1, 10.0D0, 2.0D0, 0.0D0, 0.0D0)
+    itp = ItemType(1, 0, 10.0D0, 2.0D0)
+
+    it = Item(1, itp, 0.0D0, 0.0D0)
 
     call assert_equals(10.0D0 * 2.0D0, getIArea(it))
     
@@ -208,13 +215,7 @@ contains
 
     call assert_equals(it1%number, it2%number)
 
-    call assert_equals(it1%type, it2%type)
-
-    call assert_equals(it1%class, it2%class)
-
-    call assert_equals(it1%length, it2%length)
-
-    call assert_equals(it1%width, it2%width)
+    call assert_item_type_equals(it1%type, it2%type)
 
     call assert_equals(it1%x, it2%x)
 
@@ -222,4 +223,82 @@ contains
 
   end subroutine assert_items_equals
   
+! ******************************************************************
+! ******************************************************************
+
+  subroutine assert_item_type_equals(itp1, itp2)
+
+    ! Auxiliary subroutine for testing two items
+
+    use items, only : ItemType
+
+    implicit none
+
+    ! SCALAR ARGUMENTS
+    type(ItemType), intent(in) :: itp1, itp2
+
+    call assert_equals(itp1%id, itp2%id)
+    
+    call assert_equals(itp1%class, itp2%class)
+
+    call assert_equals(itp1%length, itp2%length)
+
+    call assert_equals(itp1%width, itp2%width)
+
+  end subroutine assert_item_type_equals
+
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_change_item_type_online
+
+    use items, only : Item, ItemType
+
+    type(ItemType), target :: itt
+
+    type(Item) :: it
+
+    itt = ItemType(5, 1, 0.0D0, 0.0D0)
+
+    it = Item(10, itt, 0.0D0, 0.0D0)
+
+    call assert_equals(itt%width, it%type%width)
+
+    itt%width = 1.0D0
+    
+    call assert_equals(itt%width, it%type%width)
+
+  end subroutine test_change_item_type_online
+
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_is_type_a_pointer
+
+    use items, only : Item
+
+    type(Item) :: it1, it2
+    
+    type(Item), target :: it3
+    
+    type(Item), pointer :: pit
+
+    it1 = Item(1, NULL(), 0.0D0, 0.0D0)
+
+    it2 = it1
+
+    it1%x = 1.0D0
+
+    call assert_not_equals(it1%x, it2%x)
+
+    it3 = Item(2, NULL(), 2.0D0, 2.0D0)
+
+    pit => it3
+
+    it3%y = 0.0D0
+
+    call assert_equals(it3%y, pit%y)
+
+  end subroutine test_is_type_a_pointer
+    
 end module items_test

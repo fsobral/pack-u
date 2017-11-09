@@ -4,17 +4,32 @@ module items
 
   ! This module implements the type 'Item' and its associate utility
   ! subroutines.
+
+  type ItemType
+
+     sequence
+
+     ! Item ID
+     integer :: id
+     
+     ! Item class
+     integer :: class
+     
+     ! Item's dimensions
+     real(8) :: length, width
+
+  end type ItemType
   
   type Item
 
+     sequence
+     
      ! Item identification
      integer :: number
+     
      ! Item type
-     integer :: type
-     ! Item class
-     integer :: class
-     ! Item's dimensions
-     real(8) :: length, width
+     type(ItemType), pointer :: type
+     
      ! Item position
      real(8) :: x, y
      
@@ -27,23 +42,24 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine createSameItems(n, type, class, len, wid, nStart, v)
+  subroutine createSameItems(n, itype, nStart, v)
 
     ! This subroutine populates a (previously allocated) vector 'v'
-    ! with 'n' items of type 'type' and given dimensions 'len' and
+    ! with 'n' items of type 'itype' and given dimensions 'len' and
     ! 'wid'. Their identifying numbers will be generated from 'nStart'
     ! until 'nStart' + 'n' - 1.
     
     implicit none
     
     ! SCALAR ARGUMENTS
-    integer :: n, type, class, nStart
+    integer :: n, nStart
     real(8) :: len, wid
+    type(ItemType), target :: itype
     
     ! ARRAY ARGUMENTS
     type(Item) :: v(n)
 
-    intent(in)  :: n, type, class, nStart, len, wid
+    intent(in)  :: n, itype, nStart
     intent(out) :: v
     
     ! LOCAL SCALARS
@@ -51,8 +67,7 @@ contains
 
     do i = 1, n
 
-       v(i) = Item(nStart + i - 1, type, class, len, wid, 0.0D0, &
-                   0.0D0)
+       v(i) = Item(nStart + i - 1, itype, 0.0D0, 0.0D0)
        
     end do
     
@@ -80,7 +95,7 @@ contains
     type(Item) :: tmp
 
     tmp = v(i)
-
+    
     v(i) = v(j)
 
     v(j) = tmp
@@ -148,8 +163,27 @@ contains
     ! RETURN
     real(8) :: getIArea
 
-    getIArea = it%length * it%width
+    getIArea = getTypeArea(it%type)
 
   end function getIArea
+
+! ******************************************************************
+! ******************************************************************
+
+  function getTypeArea(itype)
+
+    ! This function return the area of item 'it'.
+
+    implicit none
+
+    ! SCALAR ARGUMENT
+    type(ItemType), intent(in) :: itype
+
+    ! RETURN
+    real(8) :: getTypeArea
+
+    getTypeArea = itype%length * itype%width
+
+  end function getTypeArea
 
 end module items

@@ -173,14 +173,14 @@ contains
 
     ! ARRAY ARGUMENTS
     character(80) :: output
-    type(Container) :: c
+    type(Container), target :: c
 
     intent(in) :: c, output
 
     ! LOCAL SCALARS
     integer :: i
     real(8) :: scale
-    type(Item) :: it
+    type(Item), pointer :: it
 
     ! Try to find a reasonable scale for drawing
 
@@ -196,10 +196,10 @@ contains
 
     do i = 1, c%nItems
 
-       it = c%pItems(i)
+       it => c%pItems(i)
        
-       write(99, FMT=0003) it%x, it%y, it%length, it%width, &
-            it%type, it%number
+       write(99, FMT=0003) it%x, it%y, it%type%length, it%type%width, &
+            it%type%id, it%number
 
     end do
 

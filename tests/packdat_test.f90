@@ -36,7 +36,7 @@ contains
   
   subroutine createFiles(it, nit, cont, ncont, qIt)
 
-    use items, only : Item
+    use items, only : ItemType
 
     use containers, only : Container
     
@@ -44,8 +44,8 @@ contains
 
     type(Container) :: cont(ncont)
 
-    type(Item) :: it(nit)
-    
+    type(ItemType) :: it(nit)
+
     integer :: nit, ncont, qIt(nit)
 
     intent(in) :: it, nit, cont, ncont, qIt
@@ -106,7 +106,7 @@ contains
     use packdat, only : loadData, nTItems, nItems, iLength, &
          iWidth, iId
 
-    use items, only : Item
+    use items, only : ItemType
 
     use containers, only : Container, emptyContainer
 
@@ -118,7 +118,7 @@ contains
     
     integer :: qIt(4)
 
-    type(Item) :: it(nit)
+    type(ItemType) :: it(nit)
 
     type(Container) :: cont(ncont)
     
@@ -126,7 +126,7 @@ contains
 
     do i = 1, nit
 
-       it(i) = Item(0, i, 0, 10.0D0 + i, 20.0D0 + i, 0.0D0, 0.0D0)
+       it(i) = ItemType(i, 0, 10.0D0 + i, 20.0D0 + i)
 
     end do
 
