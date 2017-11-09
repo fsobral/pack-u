@@ -103,7 +103,8 @@ contains
 
   subroutine test_load_data
 
-    use packdat, only : loadData, nTItems, nItems
+    use packdat, only : loadData, nTItems, nItems, iLength, &
+         iWidth, iId
 
     use items, only : Item
 
@@ -113,9 +114,9 @@ contains
     
     character(80) :: filename
 
-    integer :: i
+    integer :: i, totalIt
     
-    integer :: qIt(4) = (/10, 20, 30, 40/)
+    integer :: qIt(4)
 
     type(Item) :: it(nit)
 
@@ -136,16 +137,32 @@ contains
     end do
 
     filename = "data.txt"
+
+    qIt = (/10, 0, 0, 0/)
     
     call createFiles(it, nit, cont, ncont, qIt)
     
     call loadData(filename)
+
+    totalIt = sum(qIt)
     
-    call assert_equals(sum(qIt), nTItems)
+    call assert_equals(totalIt, nTItems)
 
     call assert_equals(nItems, nTItems)
 
-    ! TODO: test types, sizes, etc.
+    call assert_equals(totalIt, size(iLength))
+
+    call assert_equals(totalIt, size(iWidth))
+    
+    do i = 1, totalIt
+
+       call assert_equals(it(1)%length, iLength(i))
+
+       call assert_equals(it(1)%width, iWidth(i))
+
+       call assert_equals(it(1)%class, iId(i))
+
+    end do
 
   end subroutine test_load_data
 

@@ -701,7 +701,7 @@ contains
 
     ! TODO: test allocation error
     allocate(types(nTypes), tL(nTypes), tW(nTypes), maxItems(nTypes), &
-             contType(nTypes),iId(nTypes))
+             contType(nTypes), iId(nTypes))
 
     ! Load items sizes and initializes the maximum number of items in
     ! the largest container
@@ -710,7 +710,7 @@ contains
 
     do t = 1, nTypes
 
-       read(99, *) tL(t), tW(t),iId(t)
+       read(99, *) tL(t), tW(t), iId(t)
 
        call setMaxItems(t, tL(t), tW(t))
 
