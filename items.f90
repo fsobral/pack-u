@@ -28,7 +28,7 @@ module items
      integer :: number
      
      ! Item type
-     type(ItemType), pointer :: type
+     type(ItemType), pointer :: type => NULL()
      
      ! Item position
      real(8) :: x, y

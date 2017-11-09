@@ -64,10 +64,8 @@ contains
     
     do i = 1, nit
        
-       call random_number(typ)
-
        write(99, FMT = 100) it(i)%length, it(i)%width, &
-            NINT(2.0D0 * typ)
+            it(i)%class
 
        write(98, *) qIt(i)
 
@@ -126,7 +124,7 @@ contains
 
     do i = 1, nit
 
-       it(i) = ItemType(i, 0, 10.0D0 + i, 20.0D0 + i)
+       it(i) = ItemType(i, 17, 10.0D0 + i, 20.0D0 + i)
 
     end do
 
@@ -153,6 +151,8 @@ contains
     call assert_equals(totalIt, size(iLength))
 
     call assert_equals(totalIt, size(iWidth))
+
+    call assert_equals(totalIt, size(iId))
     
     do i = 1, totalIt
 

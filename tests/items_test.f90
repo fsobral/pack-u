@@ -300,5 +300,21 @@ contains
     call assert_equals(it3%y, pit%y)
 
   end subroutine test_is_type_a_pointer
+
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_null_item_type
+
+    use items, only : Item
+
+    type(Item) :: it
+
+    it = Item(1, NULL(), 0.0D0, 0.0D0)
+
+    call assert_false(ASSOCIATED(it%type))
+
+  end subroutine test_null_item_type
+  
     
 end module items_test
