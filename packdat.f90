@@ -77,7 +77,7 @@ module packdat
             initialpoint, loadData, drawSol, extractBoxes,        &
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
-            saveSol,cId,iId
+            saveSol, shutdown, cId, iId
 
 contains
 
@@ -1280,5 +1280,36 @@ write(10,*) 'Container id'
             ', cor(',I2,'), currentpen, "', I4, '");')
 
   end subroutine drawSol
+  
+! ******************************************************************
+! ******************************************************************
 
+  subroutine shutdown()
+
+    ! This subroutine deallocates all vectors and deassociates all
+    ! the pointers
+    !
+    ! TODO: test deallocation errors.
+    ! TODO: test if was allocated!
+
+    ! deallocate(cType)
+    
+    deallocate(cLength_, cWidth_)
+
+    deallocate(iType_, iNumber_, iLength_, iWidth_)
+
+    deallocate(maxItems, contType, cTypeUsed_, cStartEnd_)
+
+    deallocate(cId, iId)
+
+    iType => NULL()
+
+    iNumber => NULL()
+
+    iLength => NULL()
+
+    iWidth => NULL()
+  
+  end subroutine shutdown
+  
 end module packdat
