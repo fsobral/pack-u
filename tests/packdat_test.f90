@@ -54,7 +54,7 @@ contains
 
     real(8) :: typ
 
-    ! Generate random items
+    ! Generate items
     
     open(99, FILE = "items.txt")
 
@@ -75,7 +75,7 @@ contains
 
     close(98)
 
-    ! Generate random containers
+    ! Generate containers
     
     open(99, FILE = "containers.txt")
 
@@ -99,11 +99,10 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine test_load_data
+  subroutine test_load_ordered_containers
 
-    use packdat, only : loadData, nTItems, nItems, iLength, &
-         iWidth, iId, nContainers, setCurrContainer, cLength, &
-         cWidth, cId, shutdown
+    use packdat, only : loadData, nContainers, setCurrContainer, &
+         cLength, cWidth, reset
 
     use items, only : ItemType
 
@@ -111,7 +110,73 @@ contains
 
     implicit none
 
-    integer, parameter :: nit = 4, ncont = 3
+    character(80) :: filename
+
+    integer :: i
+
+    real(8) :: prevCArea, currCArea
+    
+    integer :: qIt(1) = (/ 10 /)
+
+    type(ItemType) :: it(1)
+
+    type(Container) :: cont(3)
+    
+    call reset()
+
+    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+
+    cont(1) = emptyContainer(1, 1.0D0, 1.0D0)
+
+    cont(2) = emptyContainer(2, 5.0D0, 5.0D0)
+
+    cont(3) = emptyContainer(3, 2.0D0, 2.0D0)
+
+    filename = "data.txt"
+
+    ! Test 1
+    
+    qIt = (/10/)
+    
+    call createFiles(it, 1, cont, 3, qIt)
+    
+    call loadData(filename)
+
+    call assert_equals(3, nContainers)
+
+    prevCArea = 0.0D0
+    
+    do i = 1, 3
+
+       call setCurrContainer(i)
+       
+       currCArea = cLength * cWidth
+       
+       call assert_true( prevCArea .le. currCArea, &
+            "Unsorted containers." )
+
+       prevCArea = currCArea
+
+    end do    
+
+  end subroutine test_load_ordered_containers
+  
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_load_data_single
+
+    use packdat, only : loadData, nTItems, nItems, iLength, &
+         iWidth, iId, nContainers, setCurrContainer, cLength, &
+         cWidth, cId, reset
+
+    use items, only : ItemType
+
+    use containers, only : Container, emptyContainer
+
+    implicit none
+
+    integer, parameter :: nit = 4, ncont = 1
     
     character(80) :: filename
 
@@ -125,6 +190,8 @@ contains
 
     type(Container) :: cont(ncont)
     
+    call reset()
+
     do i = 1, nit
 
        it(i) = ItemType(i, 17, 10.0D0 + i, 20.0D0 + i)
@@ -143,18 +210,18 @@ contains
     
     qIt = (/10, 0, 0, 0/)
     
-    call createFiles(it, nit, cont, 1, qIt)
+    call createFiles(it, nit, cont, ncont, qIt)
     
     call loadData(filename)
     
 
-    call assert_equals(1, nContainers)
+    call assert_equals(ncont, nContainers)
 
-    call setCurrContainer(1)
+    call setCurrContainer(ncont)
 
-    call assert_equals(cont(1)%length, cLength)
+    call assert_equals(cont(ncont)%length, cLength)
 
-    call assert_equals(cont(1)%width, cWidth)
+    call assert_equals(cont(ncont)%width, cWidth)
     
 
     totalIt = sum(qIt)
@@ -178,33 +245,90 @@ contains
        call assert_equals(it(1)%class, iId(i))
 
     end do
+          
+  end subroutine test_load_data_single
 
-    ! Test 2
+! ******************************************************************
+! ******************************************************************
 
-    call shutdown()
+  subroutine test_load_data_many
+
+    use packdat, only : loadData, nTItems, nItems, iLength, &
+         iWidth, iId, nContainers, setCurrContainer, cLength, &
+         cWidth, cId, reset
+
+    use items, only : ItemType
+
+    use containers, only : Container, emptyContainer
+
+    implicit none
+
+    integer, parameter :: nit = 4, ncont = 3
     
+    character(80) :: filename
+
+    integer :: i, j, totalIt, countType, equal, diffe
+
+    real(8) :: prevCArea, currCArea
+    
+    integer :: qIt(4)
+
+    type(ItemType) :: it(nit)
+
+    type(Container) :: cont(ncont)
+    
+    call reset()
+
+    do i = 1, nit
+
+       it(i) = ItemType(i, 17, 10.0D0 + i, 20.0D0 + i)
+
+    end do
+
+    do i = 1, ncont
+
+       cont(i) = emptyContainer(i, 100.0D0 + i, 200.0D0 - 2 * i)
+
+    end do
+
+    filename = "data.txt"
+
     qIt = (/10, 0, 20, 30/)
     
     call createFiles(it, nit, cont, ncont, qIt)
     
     call loadData(filename)
 
-
     call assert_equals(ncont, nContainers)
 
-    prevCArea = 0.0D0
+    equal = 0
+
+    diffe = 0
     
     do i = 1, ncont
 
        call setCurrContainer(i)
-       
-       currCArea = cLength * cWidth
-       
-       call assert_true( prevCArea .le. currCArea )
 
-       prevCArea = currCArea
+       do j = 1, ncont
 
-    end do    
+          if ( cLength .eq. cont(j)%length .and. &
+               cWidth .eq. cont(j)%width ) then
+
+             equal = equal + 1
+
+          else
+
+             diffe = diffe + 1
+
+          end if
+
+       end do
+       
+    end do
+
+    call assert_equals(3, equal, "Containers' dimensions incorrect")
+
+    call assert_equals(6, diffe, "Containers' dimensions incorrect")
 
     totalIt = sum(qIt)
 
@@ -229,11 +353,10 @@ contains
 
        end do
 
-       call assert_equals(qIt(i), countType)
+       call assert_equals(qIt(i), countType, "Wrong number of items")
 
     end do
           
-
-  end subroutine test_load_data
+  end subroutine test_load_data_many
 
 end module packdat_test
