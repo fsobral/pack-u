@@ -43,10 +43,10 @@ module packdat
   real(8), target, allocatable :: cLength_(:)
   real(8), target, allocatable :: cWidth_(:)
   ! Item's type
-  integer, pointer :: iType(:)
+  integer, pointer :: iType(:) => NULL()
   integer, target, allocatable :: iType_(:)
   ! Item's number
-  integer, pointer :: iNumber(:)
+  integer, pointer :: iNumber(:) => NULL()
   integer, target, allocatable :: iNumber_(:)
   ! Item's dimensions
   real(8), target, allocatable :: iLength_(:)
@@ -58,14 +58,14 @@ module packdat
   integer, allocatable :: contType(:)
 
   ! Types of containers used
-  integer, pointer :: cTypeUsed_(:)
+  integer, allocatable :: cTypeUsed_(:)
   ! Index to the items in the container
-  integer, pointer :: cStartEnd_(:)
+  integer, allocatable :: cStartEnd_(:)
 
   ! COMMON ARRAYS
 
   ! Pointer to current item's dimensions
-  real(8), pointer :: iLength(:), iWidth(:)
+  real(8), pointer :: iLength(:) => NULL(), iWidth(:) => NULL()
 
   !Id for containers and items
   integer, allocatable :: cId(:), iId(:)
@@ -77,7 +77,7 @@ module packdat
             initialpoint, loadData, drawSol, extractBoxes,        &
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
-            saveSol, shutdown, cId, iId
+            saveSol, reset, cId, iId
 
 contains
 
@@ -1284,7 +1284,7 @@ write(10,*) 'Container id'
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine shutdown()
+  subroutine reset()
 
     ! This subroutine deallocates all vectors and deassociates all
     ! the pointers
@@ -1293,15 +1293,31 @@ write(10,*) 'Container id'
     ! TODO: test if was allocated!
 
     ! deallocate(cType)
+
+    if ( allocated(cLength_) ) deallocate(cLength_)
     
-    deallocate(cLength_, cWidth_)
-
-    deallocate(iType_, iNumber_, iLength_, iWidth_)
-
-    deallocate(maxItems, contType, cTypeUsed_, cStartEnd_)
-
-    deallocate(cId, iId)
-
+    if ( allocated(cWidth_) ) deallocate(cWidth_)
+    
+    if ( allocated(iType_) ) deallocate(iType_)
+    
+    if ( allocated(iNumber_) ) deallocate(iNumber_)
+    
+    if ( allocated(iLength_) ) deallocate(iLength_)
+    
+    if ( allocated(iWidth_) ) deallocate(iWidth_)
+    
+    if ( allocated(maxItems) ) deallocate(maxItems)
+    
+    if ( allocated(contType) ) deallocate(contType)
+    
+    if ( allocated(cTypeUsed_) ) deallocate(cTypeUsed_)
+    
+    if ( allocated(cStartEnd_) ) deallocate(cStartEnd_)
+    
+    if ( allocated(cId) ) deallocate(cId)
+    
+    if ( allocated(iId) ) deallocate(iId)
+    
     iType => NULL()
 
     iNumber => NULL()
@@ -1310,6 +1326,6 @@ write(10,*) 'Container id'
 
     iWidth => NULL()
   
-  end subroutine shutdown
+  end subroutine reset
   
 end module packdat
