@@ -1284,6 +1284,62 @@ write(10,*) 'Container id'
 ! ******************************************************************
 ! ******************************************************************
 
+  subroutine sortContainers(size, list)
+
+    ! SCALAR ARGUMENTS
+    integer :: size
+
+    ! ARRAY ARGUMENTS
+    integer :: list(size)
+
+    intent(in   ) :: size
+    intent(inout) :: list
+
+    ! LOCAL SCALARS
+    integer :: i, j, tmp, minI, minC, currC
+
+    do i = 1, size
+
+       minI = i
+
+       minC = list(i)
+    
+       do j = i + 1, size
+       
+          currC = list(j)
+       
+          ! Select the smallest and least important container
+
+          if ( (cId(currC) .lt. cId(minC)) .or. &
+               ( (cId(currC) .lt. cId(minC)) .and. &
+               (cWidth_(currC) * cLength_(currC)) .lt. &
+               (cWidth_(minC) * cLength_(minC))) ) then
+
+             minC = currC
+
+             minI = j
+
+          end if
+
+          if ( i .ne. minI ) then
+          
+             tmp = list(i)
+
+             list(i) = list(minI)
+
+             list(minI) = tmp
+
+          end if
+
+       end do
+
+    end do
+
+  end subroutine sortContainers
+  
+! ******************************************************************
+! ******************************************************************
+
   subroutine reset()
 
     ! This subroutine deallocates all vectors and deassociates all
