@@ -39,6 +39,8 @@ module packdat
 
   ! Container's type
   integer, allocatable :: cType(:)
+  !Container's id
+  integer, allocatable :: cId_(:)
   ! Container's dimensions
   real(8), target, allocatable :: cLength_(:)
   real(8), target, allocatable :: cWidth_(:)
@@ -51,7 +53,8 @@ module packdat
   ! Item's dimensions
   real(8), target, allocatable :: iLength_(:)
   real(8), target, allocatable :: iWidth_(:)
-
+  !Item's Id
+  integer, target, allocatable :: iId_(:)
   ! Maximum number of items in the largest Container
   integer, allocatable :: maxItems(:)
   ! Type of container for each type of item
@@ -67,9 +70,9 @@ module packdat
   ! Pointer to current item's dimensions
   real(8), pointer :: iLength(:), iWidth(:)
 
-  !Id for containers and items
-  integer, allocatable :: cId(:), iId(:)
-
+  !Pointer Id for containers and items
+  integer, pointer :: iId(:)
+  integer, pointer :: cId(:)
   private
 
   public :: iLength, iWidth, cLength, cWidth, nItems, nTItems,    &
@@ -668,11 +671,11 @@ contains
     implicit none
 
     ! LOCAL SCALARS
-    integer :: i, t, iprev
+    integer :: i, t, iprev,k
     character(80) :: filename
 
     ! LOCAL ARRAYS
-    integer, allocatable :: types(:)
+    integer, allocatable :: types(:),tId(:)
     real(8), allocatable :: tW(:), tL(:)
 
     ! Container data
@@ -681,11 +684,11 @@ contains
 
     read(99, *) nContainers
 
-    allocate(clength_(nContainers), cWidth_(nContainers),cId(nContainers))
+    allocate(clength_(nContainers), cWidth_(nContainers),cId_(nContainers))
 
     do i = 1, nContainers
 
-       read(99, *) cLength_(i), cWidth_(i), cId(i)
+       read(99, *) cLength_(i), cWidth_(i), cId_(i)
 
     end do
 
@@ -701,7 +704,7 @@ contains
 
     ! TODO: test allocation error
     allocate(types(nTypes), tL(nTypes), tW(nTypes), maxItems(nTypes), &
-             contType(nTypes), iId(nTypes))
+             contType(nTypes), tId(nTypes))
 
     ! Load items sizes and initializes the maximum number of items in
     ! the largest container
@@ -710,7 +713,7 @@ contains
 
     do t = 1, nTypes
 
-       read(99, *) tL(t), tW(t), iId(t)
+       read(99, *) tL(t), tW(t), tId(t)
 
        call setMaxItems(t, tL(t), tW(t))
 
@@ -744,7 +747,8 @@ contains
 
     ! TODO: test allocation error
     allocate(iType_(nTItems), iLength_(nTItems), iWidth_(nTItems), &
-             iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems))
+             iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems),&
+             iId_(nTItems))
 
     iprev = 1
 
@@ -759,6 +763,8 @@ contains
           iLength_(i) = tL(t)
 
           iWidth_(i) = tW(t)
+
+          iId_(i)=tId(t)
 
        end do
 
@@ -777,19 +783,27 @@ write(10,*) 'Container id'
 
     do i =1, nContainers
 
-      write(10,*) cId(i)
+      write(10,*) cId_(i)
     
     end do
     
-    write(10,*) 'Item Id'
-      
-    do i=1, nTypes
+    write(10,*) 'Item Id in list ', ' |   type   | ', ' |   id   |'
 
-        write(10,*) iId(i)
+    k=1
+
+    do t=1, nTypes
+
+        do i=1, types(t)
+
+          write(10,*) 'item type ', t, iId_(k)
+
+          k=k+1
+
+        end do
 
     end do
 
-    close(10)
+close(10)
 !!$    iini = 1
 !!$
 !!$    iend = nTItems
@@ -806,7 +820,7 @@ write(10,*) 'Container id'
 !!$
 !!$    iWidth  =>  iWidth_(iini:iend)
 
-    deallocate(types, tL, tW)
+    deallocate(types, tL, tW,tId)
 
   end subroutine loadData
 
