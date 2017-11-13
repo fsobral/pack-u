@@ -347,7 +347,7 @@ contains
 
              c = c + 1
 
-             call swap(x, iWidth, iLength, iType, iNumber, i, c)
+             call swap(x, iWidth, iLength, iType, iNumber,iId, i, c)
 
           end if
 
@@ -504,7 +504,7 @@ contains
 
        if ( min_j .ne. i ) then
           
-          call swap(x, iWidth, iLength, iType, iNumber, i, min_j)
+          call swap(x, iWidth, iLength, iType, iNumber,iId, i, min_j)
 
        end if
 
@@ -902,7 +902,7 @@ close(10)
 
        write(*,*) 'Appending item', iNumber_(item)
 
-       call swap(x, iWidth_, iLength_, iType_, iNumber_, item, iend + 1)
+       call swap(x, iWidth_, iLength_, iType_, iNumber_,iId_ ,item, iend + 1)
 
        call updateCurrItems(iini, iend + 1)
 
@@ -979,7 +979,7 @@ close(10)
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine swap(x, vw, vl, vt, vn, it1, it2)
+  subroutine swap(x, vw, vl, vt, vn,vid,it1, it2)
 
     ! Swaps positions related to items it1 and it2 in real vectors vw,
     ! vl and integer vectors vt, vn
@@ -991,10 +991,10 @@ close(10)
 
     ! ARRAY ARGUMENTS
     real(8) :: vw(:), vl(:), x(:)
-    integer :: vt(:), vn(:)
+    integer :: vt(:), vn(:),vid(:)
 
     intent(in   ) :: it1, it2
-    intent(inout) :: vw, vl, vt, vn, x
+    intent(inout) :: vw, vl, vt, vn, x,vid
 
     ! LOCAL SCALARS
     integer :: itmp
@@ -1013,6 +1013,8 @@ close(10)
     call iswap(vt, it1, it2)
 
     call iswap(vn, it1, it2)
+
+	call iswap(vid,it1, it2)
 
   end subroutine swap
 
@@ -1046,7 +1048,7 @@ close(10)
 
           write(*,*) 'Item', iNumber(i)
 
-          call swap(x, iLength, iWidth, iType, iNumber, pos, i)
+          call swap(x, iLength, iWidth, iType, iNumber,iId, pos, i)
 
           pos = pos + 1
 
@@ -1068,7 +1070,7 @@ close(10)
 
              write(*, *) 'Detected overlapping between', iNumber(i), 'and', iNumber(j)
 
-             call swap(x, iLength, iWidth, iType, iNumber, i, pos)
+             call swap(x, iLength, iWidth, iType, iNumber,iId, i, pos)
 
              pos = pos - 1
 
@@ -1167,6 +1169,8 @@ close(10)
     iWidth  => iWidth_(iini:iend)
 
     iLength => iLength_(iini:iend)
+
+	iId =>iId_(iini:iend) 
 
   end subroutine updateCurrItems
 
