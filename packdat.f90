@@ -479,34 +479,46 @@ contains
     real(8), intent(inout) :: x(:)
 
     ! LOCAL SCALARS
-    integer :: i, j, min_j
+    integer :: i, j, min_j,k
     real(8) :: curr_area, min_area    
+
+    do k=nContainers,1,-1
     
-    do i = 1, nItems - 1
+   		do i = 1, nItems - 1
 
-       min_area = iWidth(i) * iLength(i)
+       		if ( iId(i) .eq. cId_(k)) then
 
-       min_j    = i
+       			min_area = iWidth(i) * iLength(i)
 
-       do j = i + 1, nItems
+       			min_j    = i
 
-          curr_area = iWidth(j) * iLength(j)
+       			do j = i + 1, nItems
 
-          if ( curr_area .le. min_area ) then
+		  			if ( iId(j) .eq. cId_(k)) then
 
-             min_area = curr_area
+          				curr_area = iWidth(j) * iLength(j)
 
-             min_j    = j
+          				if ( curr_area .le. min_area ) then
 
-          end if
+             				min_area = curr_area
 
-       end do
+             				min_j    = j
 
-       if ( min_j .ne. i ) then
+          				end if
+
+          			end if
+
+       			end do
+
+		       if ( min_j .ne. i ) then
           
-          call swap(x, iWidth, iLength, iType, iNumber,iId, i, min_j)
+		       		call swap(x, iWidth, iLength, iType, iNumber,iId, i, min_j)
 
-       end if
+		       end if
+
+	       end if
+
+	    end do
 
     end do
 
