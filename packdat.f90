@@ -481,7 +481,7 @@ contains
     ! LOCAL SCALARS
     integer :: i, j, min_j,k
     real(8) :: curr_area, min_area    
-
+    !I tried change the priority
     do k=nContainers,1,-1
     
    		do i = 1, nItems - 1
