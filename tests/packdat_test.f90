@@ -93,6 +93,77 @@ contains
 100 FORMAT(F5.1,1X,F5.1,1X,I2)
     
   end subroutine createFiles
+
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_sortContainers_with_id
+
+    use packdat, only : loadData, reset, sortContainers
+
+    use items, only: ItemType
+
+    use containers, only: Container, emptyContainer
+    
+    implicit none
+
+    character(80) :: filename
+
+    type(ItemType) :: it(1)
+
+    type(Container) :: cont(3)
+
+    integer :: L(3)
+
+    call reset()
+
+    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+
+    cont(1) = emptyContainer(1, 1, 1.0D0, 1.0D0)
+
+    cont(2) = emptyContainer(2, 0, 5.0D0, 5.0D0)
+
+    cont(3) = emptyContainer(3, 0, 2.0D0, 2.0D0)
+
+    call createFiles(it, 1, cont, 3, (/ 0 /))
+    
+    filename = 'data.txt'
+    
+    call loadData(filename)
+
+    ! No changes
+    
+    L = (/ 2, 1, 0 /)
+
+    call sortContainers(2, L)
+
+    call assert_equals(2, L(1))
+
+    call assert_equals(1, L(2))
+
+    ! Inverted id order
+    
+    L = (/ 1, 2, 0 /)
+
+    call sortContainers(2, L)
+
+    call assert_equals(2, L(1))
+
+    call assert_equals(1, L(2))
+
+    ! Full vector
+
+    L = (/ 1, 2, 3 /)
+    
+    call sortContainers(3, L)
+
+    call assert_equals(3, L(1))
+
+    call assert_equals(2, L(2))
+
+    call assert_equals(1, L(3))
+    
+  end subroutine test_sortContainers_with_id
   
 ! ******************************************************************
 ! ******************************************************************
