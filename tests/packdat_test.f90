@@ -495,6 +495,107 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
+  subroutine test_get_available_containers
+
+    use packdat, only : loadData, reset, getAvContainers, nContainers
+
+    use items, only : ItemType
+
+    use containers, only : Container, emptyContainer
+
+    implicit none
+
+    character(80) :: filename
+
+    integer :: i, j
+
+    real(8) :: prevCArea, currCArea
+    
+    integer :: qIt(2), L(3), nL
+
+    logical :: hasCntnr
+
+    type(ItemType) :: it(2)
+
+    type(Container) :: cont(3)
+    
+    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+
+    it(2) = ItemType(0, 1, 0.0D0, 0.0D0)
+
+    cont(1) = emptyContainer(1, 0, 1.0D0, 1.0D0)
+
+    cont(2) = emptyContainer(2, 0, 5.0D0, 5.0D0)
+
+    cont(3) = emptyContainer(3, 1, 2.0D0, 2.0D0)
+
+    filename = "data.txt"
+
+    ! Test 1 - Single type of item that fits all containers
+    
+    qIt = (/10, 0/)
+    
+    call createFiles(it, 2, cont, 3, qIt)
+    
+    call reset()
+
+    call loadData(filename)
+
+    call assert_equals(3, nContainers)
+    
+    call getAvContainers(L, nL)
+
+    call assert_equals(3, nL)
+
+    do i = 1, 3
+
+       hasCntnr = .false.
+       
+       do j = 1, nL
+
+          if (i .eq. L(j)) hasCntnr = .true.
+
+       end do
+
+       call assert_true(hasCntnr, "List without container.")
+
+    end do
+
+    ! Test 2 - two items, three containers and two ids
+
+    qIt = (/10, 20/)
+    
+    call createFiles(it, 2, cont, 3, qIt)
+    
+    call reset()
+
+    call loadData(filename)
+
+    call getAvContainers(L, nL)
+
+    call assert_equals(1, nL)
+
+    call assert_equals(3, L(1))
+
+    ! Test 3 - one item and one container, different IDs
+
+    qIt = (/0, 20/)
+    
+    call createFiles(it, 2, cont, 2, qIt)
+    
+    call reset()
+
+    call loadData(filename)
+
+    call getAvContainers(L, nL)
+
+    call assert_equals(0, nL)
+
+  end subroutine test_get_available_containers
+
+! ******************************************************************
+! ******************************************************************
+
   subroutine test_sort_items_with_id
 
     use packdat, only : loadData, nTItems, nItems, iLength, &
