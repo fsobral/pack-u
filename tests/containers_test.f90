@@ -12,9 +12,11 @@ contains
 
     type(Container) :: c
 
-    c = emptyContainer(1, 10.0D0, 5.0D0)
+    c = emptyContainer(1, 0, 10.0D0, 5.0D0)
 
     call assert_equals(1, c%type)
+
+    call assert_equals(0, c%class)
 
     call assert_equals(10.0D0, c%length)
 
@@ -35,6 +37,8 @@ contains
 
     c%type = 1
 
+    c%class = 2
+
     c%length = 10.0D0
 
     c%width = 20.0D0
@@ -42,6 +46,8 @@ contains
     c%nItems = 0
 
     call assert_equals(1, c%type)
+
+    call assert_equals(2, c%class)
 
     call assert_equals(10.0D0, c%length)
 

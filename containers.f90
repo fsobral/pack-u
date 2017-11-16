@@ -13,6 +13,9 @@ module containers
 
      ! Type of the container
      integer :: type
+
+     ! Class of the container
+     integer :: class
      
      ! Dimensions of the container
      real(8) :: length, width
@@ -27,16 +30,18 @@ module containers
 
   private
 
-  public Container, emptyContainer, createContainerFromSol
+  public Container, emptyContainer, createContainerFromSol, &
+         emptyCContainer
   
 contains
 
 ! ******************************************************************
 ! ******************************************************************
 
-  function emptyContainer(type, len, wid)
+  function emptyCContainer(type, len, wid)
 
-    ! This function returns an empty Container
+    ! This function returns an empty Container without class (class =
+    ! 0)
 
     implicit none
     
@@ -44,12 +49,36 @@ contains
     integer :: type
     real(8) :: len, wid
 
-    intent(in) :: type, len, wid
+    intent(in) :: type ,len, wid
+
+    ! RETURN
+    type(Container) :: emptyCContainer
+
+    emptyCContainer = emptyContainer(type, 0, len, wid)
+
+  end function emptyCContainer
+  
+! ******************************************************************
+! ******************************************************************
+
+  function emptyContainer(type, class, len, wid)
+
+    ! This function returns an empty Container
+
+    implicit none
+    
+    ! SCALAR ARGUMENTS
+    integer :: type, class
+    real(8) :: len, wid
+
+    intent(in) :: type, class ,len, wid
         
     ! RETURN
     type(Container) :: emptyContainer
 
     emptyContainer%type = type
+
+    emptyContainer%class = class
 
     emptyContainer%length = len
 
@@ -64,20 +93,20 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  function createContainerFromSol(type, len, wid, nItems, v)
+  function createContainerFromSol(type, class, len, wid, nItems, v)
 
     ! This function returns a Container with the given solution.
 
     implicit none
     
     ! SCALAR ARGUMENTS
-    integer :: type, nItems
+    integer :: type, nItems, class
     real(8) :: len, wid
 
     ! ARRAY ARGUMENTS
     type(Item) :: v(nItems)
 
-    intent(in) :: type, len, wid, nItems, v
+    intent(in) :: type, class, len, wid, nItems, v
     
     ! LOCAL SCALARS
     integer :: i
@@ -89,6 +118,8 @@ contains
     type(Container), target :: createContainerFromSol
 
     createContainerFromSol%type = type
+
+    createContainerFromSol%class = class
 
     createContainerFromSol%length = len
 
