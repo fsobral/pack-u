@@ -1400,6 +1400,7 @@ close(10)
 
     ! LOCAL SCALARS
     integer :: i, j
+    logical :: remove
 
     n = 0
     
@@ -1407,16 +1408,24 @@ close(10)
 
        ! Try to insert container j in the list
        L(n + 1) = j
+
+       remove = .false.
        
        do i = 1, nItems
 
           ! If there is an item which cannot be packed inside
           ! container j, then remove it from the list
-          if (cId_(j) .lt. iId(i)) exit
+          if (cId_(j) .lt. iId(i)) then
+
+             remove = .true.
+
+             exit
+
+          end if
 
        end do
 
-       if (cId_(j) .ge. iId(i)) n = n + 1
+       if (.not. remove) n = n + 1
        
     end do
     
