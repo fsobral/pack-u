@@ -83,10 +83,8 @@ contains
     
     do i = 1, ncont
 
-       call random_number(typ)
-       
        write(99, FMT = 100) cont(i)%length, &
-            cont(i)%width, NINT(2.0D0 * typ)
+            cont(i)%width, cont(i)%class
 
     end do
 
@@ -99,6 +97,69 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
+  subroutine test_sortContainers_noid
+
+    use packdat, only : loadData, reset, sortContainers
+
+    use items, only: ItemType
+
+    use containers, only: Container, emptyCContainer
+    
+    implicit none
+
+    character(80) :: filename
+
+    type(ItemType) :: it(1)
+
+    type(Container) :: cont(3)
+
+    integer :: L(3)
+
+    call reset()
+
+    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+
+    cont(1) = emptyCContainer(1, 1.0D0, 1.0D0)
+
+    cont(2) = emptyCContainer(2, 5.0D0, 5.0D0)
+
+    cont(3) = emptyCContainer(3, 2.0D0, 2.0D0)
+
+    call createFiles(it, 1, cont, 3, (/ 0 /))
+    
+    filename = 'data.txt'
+    
+    call loadData(filename)
+
+    L = (/ 1, 0, 0 /)
+
+    call sortContainers(1, L)
+
+    call assert_equals(1, L(1))
+    
+    L = (/ 3, 2, 0 /)
+    
+    call sortContainers(2, L)
+
+    call assert_equals(3, L(1))
+
+    call assert_equals(2, L(2))
+
+    L = (/ 1, 2, 3 /)
+
+    call sortContainers(3, L)
+
+    call assert_equals(1, L(1))
+
+    call assert_equals(3, L(2))
+
+    call assert_equals(2, L(3))
+
+  end subroutine test_sortContainers_noid
+    
+! ******************************************************************
+! ******************************************************************
+
   subroutine test_load_ordered_containers
 
     use packdat, only : loadData, nContainers, setCurrContainer, &
@@ -106,7 +167,7 @@ contains
 
     use items, only : ItemType
 
-    use containers, only : Container, emptyContainer
+    use containers, only : Container, emptyCContainer
 
     implicit none
 
@@ -126,11 +187,11 @@ contains
 
     it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
 
-    cont(1) = emptyContainer(1, 1.0D0, 1.0D0)
+    cont(1) = emptyCContainer(1, 1.0D0, 1.0D0)
 
-    cont(2) = emptyContainer(2, 5.0D0, 5.0D0)
+    cont(2) = emptyCContainer(2, 5.0D0, 5.0D0)
 
-    cont(3) = emptyContainer(3, 2.0D0, 2.0D0)
+    cont(3) = emptyCContainer(3, 2.0D0, 2.0D0)
 
     filename = "data.txt"
 
@@ -172,7 +233,7 @@ contains
 
     use items, only : ItemType
 
-    use containers, only : Container, emptyContainer
+    use containers, only : Container, emptyCContainer
 
     implicit none
 
@@ -200,7 +261,7 @@ contains
 
     do i = 1, ncont
 
-       cont(i) = emptyContainer(i, 100.0D0 + i, 200.0D0 - 2 * i)
+       cont(i) = emptyCContainer(i, 100.0D0 + i, 200.0D0 - 2 * i)
 
     end do
 
@@ -259,7 +320,7 @@ contains
 
     use items, only : ItemType
 
-    use containers, only : Container, emptyContainer
+    use containers, only : Container, emptyCContainer
 
     implicit none
 
@@ -287,7 +348,7 @@ contains
 
     do i = 1, ncont
 
-       cont(i) = emptyContainer(i, 100.0D0 + i, 200.0D0 - 2 * i)
+       cont(i) = emptyCContainer(i, 100.0D0 + i, 200.0D0 - 2 * i)
 
     end do
 

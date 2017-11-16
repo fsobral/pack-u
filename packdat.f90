@@ -77,7 +77,7 @@ module packdat
             initialpoint, loadData, drawSol, extractBoxes,        &
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
-            saveSol, reset, cId, iId
+            saveSol, reset, cId, iId, sortContainers
 
 contains
 
@@ -1286,6 +1286,11 @@ write(10,*) 'Container id'
 
   subroutine sortContainers(size, list)
 
+    ! This subroutine returns in 'list' the number of the containers
+    ! in a non-decreasing order of importance.
+    
+    implicit none
+    
     ! SCALAR ARGUMENTS
     integer :: size
 
@@ -1311,7 +1316,7 @@ write(10,*) 'Container id'
           ! Select the smallest and least important container
 
           if ( (cId(currC) .lt. cId(minC)) .or. &
-               ( (cId(currC) .lt. cId(minC)) .and. &
+               ( (cId(currC) .eq. cId(minC)) .and. &
                (cWidth_(currC) * cLength_(currC)) .lt. &
                (cWidth_(minC) * cLength_(minC))) ) then
 
@@ -1321,17 +1326,17 @@ write(10,*) 'Container id'
 
           end if
 
-          if ( i .ne. minI ) then
-          
-             tmp = list(i)
-
-             list(i) = list(minI)
-
-             list(minI) = tmp
-
-          end if
-
        end do
+
+       if ( i .ne. minI ) then
+
+          tmp = list(i)
+
+          list(i) = list(minI)
+
+          list(minI) = tmp
+
+       end if
 
     end do
 
