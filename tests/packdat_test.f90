@@ -666,5 +666,58 @@ contains
 
   end subroutine test_sort_items_with_id
 
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_get_available_containers_is_sorting
+
+    use packdat, only : loadData, reset, getAvContainers, nContainers
+
+    use items, only : ItemType
+
+    use containers, only : Container, emptyContainer
+
+    implicit none
+
+    character(80) :: filename
+
+    integer :: i, j
+
+    real(8) :: prevCArea, currCArea
+    
+    integer :: qIt(1), L(3), nL
+
+    logical :: hasCntnr
+
+    type(ItemType) :: it(2)
+
+    type(Container) :: cont(3)
+    
+    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+
+    cont(1) = emptyContainer(1, 1, 1.0D0, 1.0D0)
+
+    cont(2) = emptyContainer(2, 0, 5.0D0, 5.0D0)
+
+    cont(3) = emptyContainer(3, 0, 2.0D0, 2.0D0)
+
+    filename = "data.txt"
+
+    call createFiles(it, 1, cont, 3, (/ 10 /))
+    
+    call reset()
+
+    call loadData(filename)
+
+    call getAvContainers(L, nL)
+
+    call assert_equals(3, L(1), "Unsorted cntnr list.")
+
+    call assert_equals(2, L(2), "Unsorted cntnr list.")
+
+    call assert_equals(1, L(3), "Unsorted cntnr list.")
+
+  end subroutine test_get_available_containers_is_sorting
+
 
 end module packdat_test

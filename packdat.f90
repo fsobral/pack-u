@@ -689,11 +689,11 @@ contains
     implicit none
 
     ! LOCAL SCALARS
-    integer :: i, t, iprev,k
+    integer :: i, t, iprev, k
     character(80) :: filename
 
     ! LOCAL ARRAYS
-    integer, allocatable :: types(:),tId(:)
+    integer, allocatable :: types(:),tId(:), tcl(:)
     real(8), allocatable :: tW(:), tL(:)
 
     ! Container data
@@ -702,16 +702,54 @@ contains
 
     read(99, *) nContainers
 
-    allocate(clength_(nContainers), cWidth_(nContainers),cId_(nContainers))
+    allocate(clength_(nContainers), cWidth_(nContainers), cId_(nContainers), &
+             tcl(nContainers))
 
     do i = 1, nContainers
 
        read(99, *) cLength_(i), cWidth_(i), cId_(i)
 
+       tcl(i) = i
+
     end do
 
     close(99)
 
+!!$    ! Sort containers according to our rules.
+!!$    !
+!!$    !I don't know if this is a good idea. It can save some
+!!$    ! computation, but should be discussed.
+!!$    
+!!$    call sortContainers(nContainers, tcl)
+!!$
+!!$    do i = 1, nContainers
+!!$
+!!$       if (tcl(i) .eq. i) continue
+!!$
+!!$       call dswap(cLength_, i, tcl(i))
+!!$
+!!$       call dswap(cWidth_, i, tcl(i))
+!!$
+!!$       call iswap(cId_, i, tcl(i))
+!!$
+!!$       ! Since each position of 'tcl' is the position (AND identifier)
+!!$       ! of a container, when the container moves, due a swap, we have
+!!$       ! to change its index in 'tcl'. This should be done just here, because
+!!$       ! we are changing the real container's properties.
+!!$       do k = i + 1, nContainers
+!!$
+!!$          if (tcl(k) .eq. i) then
+!!$
+!!$             tcl(k) = tcl(i)
+!!$
+!!$             exit
+!!$
+!!$          end if             
+!!$
+!!$       end do         
+!!$
+!!$    end do
+    
     currContainer = 1
     
     ! Item data
@@ -838,7 +876,7 @@ close(10)
 !!$
 !!$    iWidth  =>  iWidth_(iini:iend)
 
-    deallocate(types, tL, tW,tId)
+    deallocate(types, tL, tW, tId, tcl)
 
   end subroutine loadData
 
@@ -1384,7 +1422,8 @@ close(10)
   subroutine getAvContainers(L, n)
 
     ! This subroutine returns in 'L' the number of the containers that
-    ! can be used to pack the current types of items.
+    ! can be used to pack the current types of items. The containers
+    ! in 'L' are sorted according to our sorting rules.
     !
     ! The criterium used is the item's and container's ID. An item can
     ! be packed inside a container if the container's ID is greater or
@@ -1428,6 +1467,8 @@ close(10)
        if (.not. remove) n = n + 1
        
     end do
+
+    call sortContainers(n, L)
     
   end subroutine getAvContainers
   
