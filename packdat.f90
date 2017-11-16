@@ -39,6 +39,8 @@ module packdat
 
   ! Container's type
   integer, allocatable :: cType(:)
+  !Container's id
+  integer, allocatable :: cId_(:)
   ! Container's dimensions
   real(8), target, allocatable :: cLength_(:)
   real(8), target, allocatable :: cWidth_(:)
@@ -51,7 +53,8 @@ module packdat
   ! Item's dimensions
   real(8), target, allocatable :: iLength_(:)
   real(8), target, allocatable :: iWidth_(:)
-
+  !Item's Id
+  integer, target, allocatable :: iId_(:)
   ! Maximum number of items in the largest Container
   integer, allocatable :: maxItems(:)
   ! Type of container for each type of item
@@ -67,9 +70,11 @@ module packdat
   ! Pointer to current item's dimensions
   real(8), pointer :: iLength(:) => NULL(), iWidth(:) => NULL()
 
-  !Id for containers and items
-  integer, allocatable :: cId(:), iId(:)
-
+  !Pointer Id for containers and items
+  ! TODO: Remove those pointers, if unused
+  integer, pointer :: iId(:) => NULL()
+  integer, pointer :: cId(:) => NULL()
+  
   private
 
   public :: iLength, iWidth, cLength, cWidth, nItems, nTItems,    &
@@ -344,7 +349,7 @@ contains
 
              c = c + 1
 
-             call swap(x, iWidth, iLength, iType, iNumber, i, c)
+             call swap(x, iWidth, iLength, iType, iNumber,iId, i, c)
 
           end if
 
@@ -476,34 +481,46 @@ contains
     real(8), intent(inout) :: x(:)
 
     ! LOCAL SCALARS
-    integer :: i, j, min_j
+    integer :: i, j, min_j,k
     real(8) :: curr_area, min_area    
+    !I tried change the priority
+    do k=nContainers,1,-1
     
-    do i = 1, nItems - 1
+   		do i = 1, nItems - 1
 
-       min_area = iWidth(i) * iLength(i)
+       		if ( iId(i) .eq. cId_(k)) then
 
-       min_j    = i
+       			min_area = iWidth(i) * iLength(i)
 
-       do j = i + 1, nItems
+       			min_j    = i
 
-          curr_area = iWidth(j) * iLength(j)
+       			do j = i + 1, nItems
 
-          if ( curr_area .le. min_area ) then
+		  			if ( iId(j) .eq. cId_(k)) then
 
-             min_area = curr_area
+          				curr_area = iWidth(j) * iLength(j)
 
-             min_j    = j
+          				if ( curr_area .le. min_area ) then
 
-          end if
+             				min_area = curr_area
 
-       end do
+             				min_j    = j
 
-       if ( min_j .ne. i ) then
+          				end if
+
+          			end if
+
+       			end do
+
+		       if ( min_j .ne. i ) then
           
-          call swap(x, iWidth, iLength, iType, iNumber, i, min_j)
+		       		call swap(x, iWidth, iLength, iType, iNumber,iId, i, min_j)
 
-       end if
+		       end if
+
+	       end if
+
+	    end do
 
     end do
 
@@ -668,11 +685,11 @@ contains
     implicit none
 
     ! LOCAL SCALARS
-    integer :: i, t, iprev
+    integer :: i, t, iprev,k
     character(80) :: filename
 
     ! LOCAL ARRAYS
-    integer, allocatable :: types(:)
+    integer, allocatable :: types(:),tId(:)
     real(8), allocatable :: tW(:), tL(:)
 
     ! Container data
@@ -681,11 +698,11 @@ contains
 
     read(99, *) nContainers
 
-    allocate(clength_(nContainers), cWidth_(nContainers),cId(nContainers))
+    allocate(clength_(nContainers), cWidth_(nContainers),cId_(nContainers))
 
     do i = 1, nContainers
 
-       read(99, *) cLength_(i), cWidth_(i), cId(i)
+       read(99, *) cLength_(i), cWidth_(i), cId_(i)
 
     end do
 
@@ -701,7 +718,7 @@ contains
 
     ! TODO: test allocation error
     allocate(types(nTypes), tL(nTypes), tW(nTypes), maxItems(nTypes), &
-             contType(nTypes), iId(nTypes))
+             contType(nTypes), tId(nTypes))
 
     ! Load items sizes and initializes the maximum number of items in
     ! the largest container
@@ -710,7 +727,7 @@ contains
 
     do t = 1, nTypes
 
-       read(99, *) tL(t), tW(t), iId(t)
+       read(99, *) tL(t), tW(t), tId(t)
 
        call setMaxItems(t, tL(t), tW(t))
 
@@ -744,7 +761,8 @@ contains
 
     ! TODO: test allocation error
     allocate(iType_(nTItems), iLength_(nTItems), iWidth_(nTItems), &
-             iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems))
+             iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems),&
+             iId_(nTItems))
 
     iprev = 1
 
@@ -759,6 +777,8 @@ contains
           iLength_(i) = tL(t)
 
           iWidth_(i) = tW(t)
+
+          iId_(i)=tId(t)
 
        end do
 
@@ -777,19 +797,27 @@ write(10,*) 'Container id'
 
     do i =1, nContainers
 
-      write(10,*) cId(i)
+      write(10,*) cId_(i)
     
     end do
     
-    write(10,*) 'Item Id'
-      
-    do i=1, nTypes
+    write(10,*) 'Item Id in list ', ' |   type   | ', ' |   id   |'
 
-        write(10,*) iId(i)
+    k=1
+
+    do t=1, nTypes
+
+        do i=1, types(t)
+
+          write(10,*) 'item type ', t, iId_(k)
+
+          k=k+1
+
+        end do
 
     end do
 
-    close(10)
+close(10)
 !!$    iini = 1
 !!$
 !!$    iend = nTItems
@@ -806,7 +834,7 @@ write(10,*) 'Container id'
 !!$
 !!$    iWidth  =>  iWidth_(iini:iend)
 
-    deallocate(types, tL, tW)
+    deallocate(types, tL, tW,tId)
 
   end subroutine loadData
 
@@ -888,7 +916,7 @@ write(10,*) 'Container id'
 
        write(*,*) 'Appending item', iNumber_(item)
 
-       call swap(x, iWidth_, iLength_, iType_, iNumber_, item, iend + 1)
+       call swap(x, iWidth_, iLength_, iType_, iNumber_,iId_ ,item, iend + 1)
 
        call updateCurrItems(iini, iend + 1)
 
@@ -965,7 +993,7 @@ write(10,*) 'Container id'
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine swap(x, vw, vl, vt, vn, it1, it2)
+  subroutine swap(x, vw, vl, vt, vn,vid,it1, it2)
 
     ! Swaps positions related to items it1 and it2 in real vectors vw,
     ! vl and integer vectors vt, vn
@@ -977,10 +1005,10 @@ write(10,*) 'Container id'
 
     ! ARRAY ARGUMENTS
     real(8) :: vw(:), vl(:), x(:)
-    integer :: vt(:), vn(:)
+    integer :: vt(:), vn(:),vid(:)
 
     intent(in   ) :: it1, it2
-    intent(inout) :: vw, vl, vt, vn, x
+    intent(inout) :: vw, vl, vt, vn, x,vid
 
     ! LOCAL SCALARS
     integer :: itmp
@@ -999,6 +1027,8 @@ write(10,*) 'Container id'
     call iswap(vt, it1, it2)
 
     call iswap(vn, it1, it2)
+
+	call iswap(vid,it1, it2)
 
   end subroutine swap
 
@@ -1032,7 +1062,7 @@ write(10,*) 'Container id'
 
           write(*,*) 'Item', iNumber(i)
 
-          call swap(x, iLength, iWidth, iType, iNumber, pos, i)
+          call swap(x, iLength, iWidth, iType, iNumber,iId, pos, i)
 
           pos = pos + 1
 
@@ -1054,7 +1084,7 @@ write(10,*) 'Container id'
 
              write(*, *) 'Detected overlapping between', iNumber(i), 'and', iNumber(j)
 
-             call swap(x, iLength, iWidth, iType, iNumber, i, pos)
+             call swap(x, iLength, iWidth, iType, iNumber,iId, i, pos)
 
              pos = pos - 1
 
@@ -1153,6 +1183,8 @@ write(10,*) 'Container id'
     iWidth  => iWidth_(iini:iend)
 
     iLength => iLength_(iini:iend)
+
+	iId =>iId_(iini:iend) 
 
   end subroutine updateCurrItems
 
@@ -1315,8 +1347,8 @@ write(10,*) 'Container id'
        
           ! Select the smallest and least important container
 
-          if ( (cId(currC) .lt. cId(minC)) .or. &
-               ( (cId(currC) .eq. cId(minC)) .and. &
+          if ( (cId_(currC) .lt. cId_(minC)) .or. &
+               ( (cId_(currC) .eq. cId_(minC)) .and. &
                (cWidth_(currC) * cLength_(currC)) .lt. &
                (cWidth_(minC) * cLength_(minC))) ) then
 
@@ -1375,9 +1407,9 @@ write(10,*) 'Container id'
     
     if ( allocated(cStartEnd_) ) deallocate(cStartEnd_)
     
-    if ( allocated(cId) ) deallocate(cId)
+    if ( allocated(cId_) ) deallocate(cId_)
     
-    if ( allocated(iId) ) deallocate(iId)
+    if ( allocated(iId_) ) deallocate(iId_)
     
     iType => NULL()
 
@@ -1386,6 +1418,10 @@ write(10,*) 'Container id'
     iLength => NULL()
 
     iWidth => NULL()
+
+    iId => NULL()
+
+    cId => NULL()
   
   end subroutine reset
   
