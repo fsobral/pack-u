@@ -16,7 +16,7 @@ program algencanma
   ! LOCAL SCALARS
   logical      :: hasAppended, useReduction
   integer      :: allocerr, i, j, it, container, numberOfSolutions, &
-       lastContainer, nAllocTrials
+       lastContainer, nAllocTrials, nCntnr
   ! Timing variables
   integer(kind=8) :: tini, tend, ticks_ps
   real(kind=8) :: elapsed, f, fbest, remArea, limItArea, area, tiArea
@@ -25,6 +25,7 @@ program algencanma
   character(80)         :: filename, solfname
   character(len=15)     :: strtmp
   real(kind=8), pointer :: x(:),lbest(:)
+  integer, allocatable  :: lCntnr(:)
 
   ! EXTERNAL SUBROUTINES
   external :: myevalf,myevalg,myevalh,myevalc,myevaljac,myevalhc, &
@@ -72,17 +73,20 @@ program algencanma
   end do 
   write(*,*) 'Items total area:', area
 
-  allocate(lbest(2 * nTItems + 1), x(2 * nTItems + 1), stat=allocerr)
+  allocate(lbest(2 * nTItems + 1), x(2 * nTItems + 1), &
+           lCntnr(nContainers), stat=allocerr)
 
   if ( allocerr .ne. 0 ) then
 
-     write(*,*) 'Allocation error in main program'
+     write(*,*) 'Allocation errors in main program'
      
      stop
      
   end if
 
-  lastContainer = nContainers
+  call getAvContainers(lCntnr, nCntnr)
+  
+  lastContainer = 1
 
   do while ( nItems .gt. 0 )
      
@@ -94,9 +98,9 @@ program algencanma
         
      end do
 
-     do container = lastContainer, 2, -1
+     do container = lastContainer, nCntnr - 1
         
-        call setCurrContainer(container)
+        call setCurrContainer(lCntnr(container))
 
         if ( cWidth * cLength .gt. tiArea ) then 
 
@@ -106,9 +110,9 @@ program algencanma
         
      end do
 
-     call setCurrContainer(container)
+     call setCurrContainer(lCntnr(container))
 
-     write(*, *) 'Selected container:', container
+     write(*, *) 'Selected container:', lCntnr(container)
 
      filename = 'sol1.asy'
 
@@ -204,19 +208,26 @@ program algencanma
 
      end do
 
-     if ( container .ne. 1 .and. remainingItems() .gt. 0 ) then
+     if ( container .ne. nCntnr .and. remainingItems() .gt. 0 ) then
 
-        write(*, *) 'Sobraram ', remainingItems(), 'itens, cancelando container', container
+        write(*, *) 'Sobraram ', remainingItems(), 'itens, cancelando container', lCntnr(container)
 
-        lastContainer = lastContainer - 1
+        lastContainer = container + 1
 
         call resetPacking()
 
      else 
 
+        ! Found a good solution. Save it, remove the packed items and
+        ! rebuild the list of possible containers.
+        
         call saveSol(solfname)
 
         call removeBoxes()
+
+        call getAvContainers(lCntnr, nCntnr)
+
+        lastContainer = 1
 
         it = it + 1
 
