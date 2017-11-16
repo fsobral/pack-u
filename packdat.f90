@@ -83,7 +83,8 @@ module packdat
             initialpoint, loadData, drawSol, extractBoxes,        &
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
-            saveSol, reset, cId, iId, sortContainers
+            saveSol, reset, cId, iId, sortContainers, &
+            getAvContainers
 
 contains
 
@@ -1376,6 +1377,50 @@ close(10)
     end do
 
   end subroutine sortContainers
+  
+! ******************************************************************
+! ******************************************************************
+
+  subroutine getAvContainers(L, n)
+
+    ! This subroutine returns in 'L' the number of the containers that
+    ! can be used to pack the current types of items.
+    !
+    ! The criterium used is the item's and container's ID. An item can
+    ! be packed inside a container if the container's ID is greater or
+    ! equal than the item's ID.
+
+    ! SCALAR ARGUMENTS
+    integer :: n
+
+    ! ARRAY ARGUMENTS
+    integer :: L(:)
+
+    intent(out) :: n, L
+
+    ! LOCAL SCALARS
+    integer :: i, j
+
+    n = 0
+    
+    do j = 1, nContainers
+
+       ! Try to insert container j in the list
+       L(n + 1) = j
+       
+       do i = 1, nItems
+
+          ! If there is an item which cannot be packed inside
+          ! container j, then remove it from the list
+          if (cId_(j) .lt. iId(i)) exit
+
+       end do
+
+       if (cId_(j) .ge. iId(i)) n = n + 1
+       
+    end do
+    
+  end subroutine getAvContainers
   
 ! ******************************************************************
 ! ******************************************************************
