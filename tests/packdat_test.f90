@@ -498,10 +498,9 @@ contains
   subroutine test_sort_items_with_id
 
     use packdat, only : loadData, nTItems, nItems, iLength, &
-         iWidth, iId, nContainers, setCurrContainer, cLength, &
-         cWidth, cId, reset
+         iWidth, iId, reset, sortItems
 
-    use items, only : ItemType
+    use items, only : ItemType, toVector
 
     use containers, only : Container, emptyCContainer
 
@@ -517,9 +516,11 @@ contains
     
     integer :: qIt(4)
 
+    real(8), allocatable :: x(:)
+
     type(ItemType) :: it(nit)
 
-    type(Container) :: cont(ncont)
+    type(Container) :: cont(1)
     
     call reset()
 
@@ -536,13 +537,31 @@ contains
     
     filename = "data.txt"
 
-    ! Test 1
+    ! Test 1, only 2 items of different types
     
-    qIt = (/10, 0, 0, 0/)
-    
-    call createFiles(it, nit, cont, ncont, qIt)
+    qIt = (/1, 1, 0, 0/)
+
+    call createFiles(it, nit, cont, 1, qIt)
     
     call loadData(filename)
+
+    call assert_equals(sum(qIt), nItems)
+    
+    allocate(x(2 * nItems))
+    
+    call sortItems(x)
+
+    call assert_true(iId(1) .lt. iId(2))
+    
+    call assert_equals(it(2)%length, iLength(1))
+
+    call assert_equals(it(2)%width, iWidth(1))
+
+    call assert_equals(it(1)%length, iLength(2))
+
+    call assert_equals(it(1)%width, iWidth(2))
+
+    deallocate(x)
 
   end subroutine test_sort_items_with_id
 
