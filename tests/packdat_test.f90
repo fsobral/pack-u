@@ -354,7 +354,8 @@ contains
     call assert_equals(cont(ncont)%length, cLength)
 
     call assert_equals(cont(ncont)%width, cWidth)
-    
+
+    call assert_equals(cont(ncont)%class, cId)    
 
     totalIt = sum(qIt)
     
@@ -490,5 +491,60 @@ contains
     end do
           
   end subroutine test_load_data_many
+
+! ******************************************************************
+! ******************************************************************
+
+  subroutine test_sort_items_with_id
+
+    use packdat, only : loadData, nTItems, nItems, iLength, &
+         iWidth, iId, nContainers, setCurrContainer, cLength, &
+         cWidth, cId, reset
+
+    use items, only : ItemType
+
+    use containers, only : Container, emptyCContainer
+
+    implicit none
+
+    integer, parameter :: nit = 4
+    
+    character(80) :: filename
+
+    integer :: i, j, totalIt, countType
+
+    real(8) :: prevCArea, currCArea
+    
+    integer :: qIt(4)
+
+    type(ItemType) :: it(nit)
+
+    type(Container) :: cont(ncont)
+    
+    call reset()
+
+    do i = 1, nit
+
+       it(i) = ItemType(i, 0, 10.0D0 + i, 20.0D0 + i)
+
+    end do
+
+    ! The first type of item is the most important one
+    it(1)%class = 1
+
+    cont(1) = emptyCContainer(1, 1.0D0, 1.0D0)
+    
+    filename = "data.txt"
+
+    ! Test 1
+    
+    qIt = (/10, 0, 0, 0/)
+    
+    call createFiles(it, nit, cont, ncont, qIt)
+    
+    call loadData(filename)
+
+  end subroutine test_sort_items_with_id
+
 
 end module packdat_test

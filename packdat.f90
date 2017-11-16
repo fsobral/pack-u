@@ -8,6 +8,8 @@ module packdat
   integer :: nItems
   ! Current container's dimensions
   real(8) :: cLength, cWidth
+  ! Current container's id
+  integer :: cId
 
   ! PRIVATE PARAMETERS
 
@@ -70,10 +72,9 @@ module packdat
   ! Pointer to current item's dimensions
   real(8), pointer :: iLength(:) => NULL(), iWidth(:) => NULL()
 
-  !Pointer Id for containers and items
-  ! TODO: Remove those pointers, if unused
+  ! Pointer Id for containers and items
+  ! TODO: check if iId must be public
   integer, pointer :: iId(:) => NULL()
-  integer, pointer :: cId(:) => NULL()
   
   private
 
@@ -290,6 +291,8 @@ contains
     cWidth = cWidth_(c)
 
     cLength = cLength_(c)
+
+    cId = cId_(c)
 
   end subroutine setCurrContainer
 
@@ -1421,8 +1424,6 @@ close(10)
 
     iId => NULL()
 
-    cId => NULL()
-  
   end subroutine reset
   
 end module packdat
