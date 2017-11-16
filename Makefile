@@ -2,15 +2,30 @@ TANGOLIB = /opt/tango/algencan-3.0.0/lib
 
 PACKPROBLEM = packminc
 
-BUILDDIR = build
+# Directories
 
-lib: packdat.o items.o containers.o
-	ar crv libpacku.a $^
+PACKUDIR = $(CURDIR)
+BUILDDIR = $(PACKUDIR)/build
+TESTDIR = $(PACKUDIR)/tests
+
+# Compiler options
+
+CC  = gcc
+FC  = gfortran
+FCC = 
+
+lib: libpacku.a
+
+libpacku.a: packdat.o items.o containers.o
+	ar crv $@ $^
 
 packu: $(PACKPROBLEM).o packdat.o
 	gfortran $^ -L$(TANGOLIB) -lalgencan -o $@
 	mkdir -p $(BUILDDIR)
 	mv -f $@ $(BUILDDIR)/.
+
+tests: lib
+	$(MAKE) -C $(TESTDIR) clean run
 
 %.o: %.f90
 	gfortran -c $^
