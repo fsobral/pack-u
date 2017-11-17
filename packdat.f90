@@ -647,29 +647,52 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine setMaxItems(itemType, itemL, itemW)
+  subroutine setMaxItems(itemType, itemId, itemL, itemW)
 
     ! This subroutine calculates the maximum number of items of type
-    ! 'itemType' that can be packed onto the largest container. It
-    ! automatically initializes internal vectors 'maxItems' and
-    ! 'contType'.
+    ! 'itemType' that can be packed onto the largest available
+    ! container. It automatically initializes internal vectors
+    ! 'maxItems' and 'contType'.
 
     implicit none
 
     ! SCALAR ARGUMENTS
-    integer, intent(in) :: itemType
+    integer, intent(in) :: itemType, itemId
     real(kind=8), intent(in) :: itemL, itemW
 
-    ! LOCAL SCALARS
-    integer :: maxW, maxL
-
-    maxW = INT(cWidth_(1) / itemW)
-
-    maxL = INT(cLength_(1) / itemL)
+    ! LOCAL ARRAYS
+    integer :: lC(nContainers)
     
-    maxItems(itemType) = maxW * maxL
+    ! LOCAL SCALARS
+    integer :: c, i, maxW, maxL
 
-    contType(itemType) = 1
+    do i = 1, nContainers
+       
+       lC(i) = i
+       
+    end do
+
+    call sortContainers(nContainers, lC)
+
+    do i = nContainers, 1, -1
+
+       c = lC(i)
+       
+       if ( itemId .le. cId_(c) ) then
+       
+          maxW = INT(cWidth_(c) / itemW)
+
+          maxL = INT(cLength_(c) / itemL)
+    
+          maxItems(itemType) = maxW * maxL
+
+          contType(itemType) = c
+
+          exit
+
+       end if
+
+    end do
 
   end subroutine setMaxItems
 
@@ -769,7 +792,7 @@ contains
 
        read(99, *) tL(t), tW(t), tId(t)
 
-       call setMaxItems(t, tL(t), tW(t))
+       call setMaxItems(t, tId(t), tL(t), tW(t))
 
     end do
 
