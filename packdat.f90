@@ -502,8 +502,8 @@ contains
 
           curr_area = iWidth(j) * iLength(j)
 
-          if ( (iId(j) .lt. iId(i)) .or. &
-               ((iId(j) .eq. iId(i)) .and. &
+          if ( (iId(j) .lt. iId(min_j)) .or. &
+               ((iId(j) .eq. iId(min_j)) .and. &
                 (curr_area .le. min_area)) ) then
 
              min_area = curr_area
