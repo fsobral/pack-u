@@ -488,46 +488,44 @@ contains
     integer :: i, j, min_j,k
     real(8) :: curr_area, min_area    
     !I tried change the priority
-    do k=nContainers,1,-1
-    
-   		do i = 1, nItems - 1
+!!$    do k=nContainers,1,-1
+!!$    
+    do i = 1, nItems - 1
 
-       		if ( iId(i) .eq. cId_(k)) then
+!!$       		if ( iId(i) .eq. cId_(k)) then
+!!$
+       min_area = iWidth(i) * iLength(i)
 
-       			min_area = iWidth(i) * iLength(i)
+       min_j    = i
+       
+       do j = i + 1, nItems
 
-       			min_j    = i
+          curr_area = iWidth(j) * iLength(j)
 
-       			do j = i + 1, nItems
+          if ( (iId(j) .lt. iId(i)) .or. &
+               ((iId(j) .eq. iId(i)) .and. &
+                (curr_area .le. min_area)) ) then
 
-		  			if ( iId(j) .eq. cId_(k)) then
+             min_area = curr_area
 
-          				curr_area = iWidth(j) * iLength(j)
+             min_j    = j
 
-          				if ( curr_area .le. min_area ) then
+          end if
 
-             				min_area = curr_area
+       end do
 
-             				min_j    = j
-
-          				end if
-
-          			end if
-
-       			end do
-
-		       if ( min_j .ne. i ) then
+       if ( min_j .ne. i ) then
           
-		       		call swap(x, iWidth, iLength, iType, iNumber,iId, i, min_j)
+          call swap(x, iWidth, iLength, iType, iNumber, iId, i, min_j)
 
-		       end if
-
-	       end if
-
-	    end do
+       end if
+!!$
+!!$	       end if
 
     end do
 
+!!$    end do
+!!$
   end subroutine sortItems
 
 ! ******************************************************************
