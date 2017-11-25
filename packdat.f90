@@ -666,7 +666,7 @@ contains
     integer :: lC(nContainers)
     
     ! LOCAL SCALARS
-    integer :: i, maxW, maxL
+    integer :: i, cntrn, maxW, maxL
 
     do i = 1, nContainers
        
@@ -676,19 +676,27 @@ contains
 
     call sortContainers(nContainers, lC)
 
+    c = - 1
+
+    nItms = 0
+    
     do i = nContainers, 1, -1
 
-       c = lC(i)
+       cntrn = lC(i)
        
-       if ( itemId .le. cId_(c) ) then
-       
-          maxW = INT(cWidth_(c) / itemW)
+       if ( itemId .le. cId_(cntrn) ) then
 
-          maxL = INT(cLength_(c) / itemL)
+          maxW = AINT(cWidth_(cntrn) / itemW)
+
+          maxL = AINT(cLength_(cntrn) / itemL)
+          
+          if ( maxW * maxL .gt. nItms ) then
     
-          nItms = maxW * maxL
+             nItms = maxW * maxL
 
-          exit
+             c = cntrn
+
+          end if
 
        end if
 
