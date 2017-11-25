@@ -647,20 +647,19 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine setMaxItems_(itemType, itemId, itemL, itemW, c, nItms)
+  subroutine setMaxItems_(itemId, itemL, itemW, c, nItms)
 
-    ! This subroutine calculates the maximum number of items of type
-    ! 'itemType' that can be packed onto the largest available
-    ! container. It automatically initializes internal vectors
-    ! 'maxItems' and 'contType'.
+    ! This subroutine calculates the maximum number of items of the
+    ! given size and 'itemId' that can be packed onto the largest
+    ! available container.
 
     implicit none
 
     ! SCALAR ARGUMENTS
-    integer :: itemType, itemId, c, nItms
+    integer :: itemId, c, nItms
     real(kind=8) :: itemL, itemW
 
-    intent(in ) :: itemType, itemId, itemL, itemW
+    intent(in ) :: itemId, itemL, itemW
     intent(out) :: c, nItms
 
     ! LOCAL ARRAYS
@@ -793,7 +792,7 @@ contains
 
        read(99, *) tL(t), tW(t), tId(t)
 
-       call setMaxItems_(t, tId(t), tL(t), tW(t), &
+       call setMaxItems_(tId(t), tL(t), tW(t), &
                          contType(t), maxItems(t))
 
     end do
