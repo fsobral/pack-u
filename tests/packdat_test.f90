@@ -691,7 +691,7 @@ contains
 
     logical :: hasCntnr
 
-    type(ItemType) :: it(2)
+    type(ItemType) :: it(1)
 
     type(Container) :: cont(3)
     
@@ -721,5 +721,67 @@ contains
 
   end subroutine test_get_available_containers_is_sorting
 
+! ******************************************************************
+! ******************************************************************
 
+  subroutine test_set_max_items
+
+    use packdat, only : loadData, reset, setMaxItems_
+
+    use items, only : ItemType
+
+    use containers, only : Container, emptyContainer
+
+    implicit none
+
+    character(80) :: filename
+
+    integer :: i, j
+
+    real(8) :: prevCArea, currCArea
+    
+    integer :: qIt(2), L(3), nL, c, nItms
+
+    logical :: hasCntnr
+
+    type(ItemType) :: it(2)
+
+    type(Container) :: cont(3)
+    
+    it(1) = ItemType(1, 0, 1.0D0, 1.0D0)
+
+    it(2) = ItemType(2, 1, 2.0D0, 2.0D0)
+
+    cont(1) = emptyContainer(1, 1, 10.0D0, 10.0D0)
+
+    cont(2) = emptyContainer(2, 0, 8.0D0, 8.0D0)
+
+    cont(3) = emptyContainer(3, 0, 20.0D0, 20.0D0)
+
+    filename = "data.txt"
+
+    call createFiles(it, 2, cont, 3, (/ 0, 0 /))
+    
+    call reset()
+
+    call loadData(filename)
+
+    call setMaxItems_(it(1)%class, it(1)%length, it(1)%width, &
+         c, nItms)
+
+    call assert_equals(3, c, "Wrong container for maxItems")
+
+    call assert_equals(400, nItms)
+
+    call setMaxItems_(it(2)%class, it(2)%length, it(2)%width, &
+         c, nItms)
+    
+    call assert_equals(1, c, "Wrong container for maxItems")
+
+    call assert_equals(25, nItms)
+
+
+  end subroutine test_set_max_items
+  
+  
 end module packdat_test
