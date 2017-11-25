@@ -44,30 +44,32 @@ To build Pack-U you need to
 The generated file is located in the path given by `BUILDDIR`
 variable, which is `build/` by default.
 
-## Setting up your problem
+## Setting up your problem <A ID="setting"></A>
 
 Pack-U needs 3 files to solve a packing problem:
 
   - `containers.txt`: the type of containers that can be used. The
     first line contains the **number** of different containers. Each
-    remaining line contains the **length** and **width** of each
-    container, from the largest area to the smallest one. The
-    following example illustrates the case of 2 containers:
+    remaining line contains the **length**, **width** and **id** of
+    each container. The following example illustrates the case of 2
+    containers with the same *id* (the use of *id*s is explained
+    [here](#ID)):
 
 		2
-		40.0 30.0
-		28.5 17.5
+		40.0 30.0 0
+		28.5 17.5 0
 
   - `items.txt`: the type of items that can be packed. The first line
-    contains the **number** of different items. Each remaining line
-    contains a triple: **width**, **height** and **weight** (not used
-    yet). The following example illustrates the case of 4 items:
+    contains the **number** of different types of items. Each
+    remaining line contains a triple: **width**, **height** and
+    **id**. The following example illustrates the case of 4 items with
+    the same *id* (the use of *id*s is explained [here](#ID)):
 
         4
-        4 4 50
-        5.7 5.7 200
-        5.7 5.7 100
-        7.5 7.5 500   
+        4 4 0
+        5.7 5.7 0
+        5.7 5.7 0
+        7.5 7.5 0
 
   - `data.txt`: the **number items of each type** to be packed. It has
     the same number of lines as the number of type of items in the
@@ -83,7 +85,7 @@ often, since they represent all the available items and
 containers. Each packing problem consists of a different `data.txt`
 file.
 
-**Important**: All the unit measures must be the same.
+**Important**: All the unit measures for sizes must be the same.
 
 ## Running
 
@@ -153,6 +155,43 @@ and the images generated are
 ![][sol3] ![][sol4] ![][sol5]
 ![][sol6] ![][sol7] ![][sol8]
 
+## The *id* parameter <A ID="ID"></A>
+
+The *id* parameter was introduced to describe which items can be
+placed in which containers. Thus, the *id*s of item types and
+containers must be related. The idea is that an item of type with *id*
+`X` can be packed into containers of *id* `Y` if and only if `Y >= X`.
+
+> For example, items with *id* `1` can be packed into containers of
+> *id* `1` and `2`, but **cannot** be packed into container with *id*
+> `0`!
+
+Let's recall the [full example](#setting) above and insert some
+*id*s. In this new example, items of type 1 can only be packed into
+containers of type 2 (smalles containers).
+
+  - `containers.txt`:
+
+        2
+       	40.0 30.0 0
+        28.5 17.5 1
+
+  - `items.txt`:
+
+        4
+        4 4 1
+        5.7 5.7 0
+        5.7 5.7 0
+        7.5 7.5 0
+
+  - `data.txt`:
+
+        300
+        20
+        0
+        70
+
+
 ## Solver configuration
 
 ALGENCAN provides many configuration parameters by the use of the
@@ -172,6 +211,12 @@ create an empty file `.silent` in the same directory where the
 executable is run:
 
     touch .silent
+
+## Improvements
+
+  - **November, 2017**: Items and containers have priority
+      identification.
+  - **July, 2017**: First version
 
 [logo]: docs/images/packu-logo.png
 
