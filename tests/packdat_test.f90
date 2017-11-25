@@ -117,7 +117,7 @@ contains
 
     call reset()
 
-    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+    it(1) = ItemType(0, 0, 1.0D0, 1.0D0)
 
     cont(1) = emptyContainer(1, 1, 1.0D0, 1.0D0)
 
@@ -188,7 +188,7 @@ contains
 
     call reset()
 
-    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+    it(1) = ItemType(0, 0, 1.0D0, 1.0D0)
 
     cont(1) = emptyCContainer(1, 1.0D0, 1.0D0)
 
@@ -256,7 +256,7 @@ contains
     
     call reset()
 
-    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+    it(1) = ItemType(0, 0, 1.0D0, 1.0D0)
 
     cont(1) = emptyCContainer(1, 1.0D0, 1.0D0)
 
@@ -328,7 +328,7 @@ contains
 
     do i = 1, nit
 
-       it(i) = ItemType(i, 17, 10.0D0 + i, 20.0D0 + i)
+       it(i) = ItemType(i, 0, 10.0D0 + i, 20.0D0 + i)
 
     end do
 
@@ -416,7 +416,7 @@ contains
 
     do i = 1, nit
 
-       it(i) = ItemType(i, 17, 10.0D0 + i, 20.0D0 + i)
+       it(i) = ItemType(i, 0, 10.0D0 + i, 20.0D0 + i)
 
     end do
 
@@ -521,9 +521,9 @@ contains
 
     type(Container) :: cont(3)
     
-    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+    it(1) = ItemType(0, 0, 1.0D0, 1.0D0)
 
-    it(2) = ItemType(0, 1, 0.0D0, 0.0D0)
+    it(2) = ItemType(0, 1, 1.0D0, 1.0D0)
 
     cont(1) = emptyContainer(1, 0, 1.0D0, 1.0D0)
 
@@ -580,18 +580,18 @@ contains
     call assert_equals(3, L(1))
 
     ! Test 3 - one item and one container, different IDs
-
-    qIt = (/0, 20/)
-    
-    call createFiles(it, 2, cont, 2, qIt)
-    
-    call reset()
-
-    call loadData(filename)
-
-    call getAvContainers(L, nL)
-
-    call assert_equals(0, nL)
+!!$
+!!$    qIt = (/0, 20/)
+!!$    
+!!$    call createFiles(it, 2, cont, 2, qIt)
+!!$    
+!!$    call reset()
+!!$
+!!$    call loadData(filename)
+!!$
+!!$    call getAvContainers(L, nL)
+!!$
+!!$    call assert_equals(0, nL)
 
   end subroutine test_get_available_containers
 
@@ -605,7 +605,7 @@ contains
 
     use items, only : ItemType, toVector
 
-    use containers, only : Container, emptyCContainer
+    use containers, only : Container, emptyContainer
 
     implicit none
 
@@ -623,7 +623,7 @@ contains
 
     type(ItemType) :: it(nit)
 
-    type(Container) :: cont(1)
+    type(Container) :: cont(2)
     
     call reset()
 
@@ -636,15 +636,17 @@ contains
     ! The first type of item is the most important one
     it(1)%class = 1
 
-    cont(1) = emptyCContainer(1, 1.0D0, 1.0D0)
+    cont(1) = emptyContainer(1, 0, 40.0D0, 40.0D0)
     
+    cont(2) = emptyContainer(1, 1, 40.0D0, 40.0D0)
+
     filename = "data.txt"
 
     ! Test 1, only 2 items of different types
     
     qIt = (/1, 1, 0, 0/)
 
-    call createFiles(it, nit, cont, 1, qIt)
+    call createFiles(it, nit, cont, 2, qIt)
     
     call loadData(filename)
 
@@ -695,7 +697,7 @@ contains
 
     type(Container) :: cont(3)
     
-    it(1) = ItemType(0, 0, 0.0D0, 0.0D0)
+    it(1) = ItemType(0, 0, 1.0D0, 1.0D0)
 
     cont(1) = emptyContainer(1, 1, 1.0D0, 1.0D0)
 

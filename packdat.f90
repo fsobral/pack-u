@@ -802,7 +802,16 @@ contains
 
        call setMaxItems_(tId(t), tL(t), tW(t), &
                          contType(t), maxItems(t))
+       
+       ! TODO: make loadData return an error flag.
+       if ( contType(t) .eq. -1 ) then
 
+          write(*, *) "ERROR: Item without container."
+
+          stop
+
+       end if
+       
     end do
 
     close(99)
