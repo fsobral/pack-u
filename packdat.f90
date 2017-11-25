@@ -84,7 +84,7 @@ module packdat
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
             saveSol, reset, cId, iId, sortContainers, &
-            getAvContainers
+            getAvContainers, setMaxItems_
 
 contains
 
@@ -647,7 +647,7 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine setMaxItems(itemType, itemId, itemL, itemW)
+  subroutine setMaxItems_(itemType, itemId, itemL, itemW, c, nItms)
 
     ! This subroutine calculates the maximum number of items of type
     ! 'itemType' that can be packed onto the largest available
@@ -657,14 +657,17 @@ contains
     implicit none
 
     ! SCALAR ARGUMENTS
-    integer, intent(in) :: itemType, itemId
-    real(kind=8), intent(in) :: itemL, itemW
+    integer :: itemType, itemId, c, nItms
+    real(kind=8) :: itemL, itemW
+
+    intent(in ) :: itemType, itemId, itemL, itemW
+    intent(out) :: c, nItms
 
     ! LOCAL ARRAYS
     integer :: lC(nContainers)
     
     ! LOCAL SCALARS
-    integer :: c, i, maxW, maxL
+    integer :: i, maxW, maxL
 
     do i = 1, nContainers
        
@@ -684,9 +687,7 @@ contains
 
           maxL = INT(cLength_(c) / itemL)
     
-          maxItems(itemType) = maxW * maxL
-
-          contType(itemType) = c
+          nItms = maxW * maxL
 
           exit
 
@@ -694,7 +695,7 @@ contains
 
     end do
 
-  end subroutine setMaxItems
+  end subroutine setMaxItems_
 
 ! ******************************************************************
 ! ******************************************************************
@@ -792,7 +793,8 @@ contains
 
        read(99, *) tL(t), tW(t), tId(t)
 
-       call setMaxItems(t, tId(t), tL(t), tW(t))
+       call setMaxItems_(t, tId(t), tL(t), tW(t), &
+                         contType(t), maxItems(t))
 
     end do
 
