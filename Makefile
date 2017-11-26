@@ -14,6 +14,8 @@ CC  = gcc
 FC  = gfortran
 FCC = 
 
+export
+
 lib: libpacku.a
 
 libpacku.a: packdat.o items.o containers.o
@@ -26,6 +28,7 @@ packu: $(PACKPROBLEM).o packdat.o
 
 tests: lib
 	$(MAKE) -C $(TESTDIR) clean run
+	$(MAKE) -C $(TESTDIR) pythontests
 
 %.o: %.f90
 	gfortran -c $^
