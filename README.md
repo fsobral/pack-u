@@ -259,20 +259,20 @@ executable is run:
 [sol7]: docs/images/sol7.png
 [sol8]: docs/images/sol8.png
 
-[id_sol01]: docs/images/sol001.png
-[id_sol02]: docs/images/sol002.png
-[id_sol03]: docs/images/sol003.png
-[id_sol04]: docs/images/sol004.png
-[id_sol05]: docs/images/sol005.png
-[id_sol06]: docs/images/sol006.png
-[id_sol07]: docs/images/sol007.png
-[id_sol08]: docs/images/sol008.png
-[id_sol09]: docs/images/sol009.png
-[id_sol10]: docs/images/sol010.png
-[id_sol11]: docs/images/sol011.png
-[id_sol12]: docs/images/sol012.png
-[id_sol13]: docs/images/sol013.png
-[id_sol14]: docs/images/sol014.png
-[id_sol15]: docs/images/sol015.png
+[id_sol01]: docs/images/id_sol001.png
+[id_sol02]: docs/images/id_sol002.png
+[id_sol03]: docs/images/id_sol003.png
+[id_sol04]: docs/images/id_sol004.png
+[id_sol05]: docs/images/id_sol005.png
+[id_sol06]: docs/images/id_sol006.png
+[id_sol07]: docs/images/id_sol007.png
+[id_sol08]: docs/images/id_sol008.png
+[id_sol09]: docs/images/id_sol009.png
+[id_sol10]: docs/images/id_sol010.png
+[id_sol11]: docs/images/id_sol011.png
+[id_sol12]: docs/images/id_sol012.png
+[id_sol13]: docs/images/id_sol013.png
+[id_sol14]: docs/images/id_sol014.png
+[id_sol15]: docs/images/id_sol015.png
 
 [algencan]: http://www.ime.usp.br/~egbirgin/tango
