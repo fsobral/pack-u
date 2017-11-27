@@ -123,7 +123,7 @@ Pack-U produces several files for output information:
         cp ../packlib.asy
         ../scripts/makepdf.sh
 
-    Be carefull, since this script removes all ASY files. File
+    Be careful, since this script removes all ASY files. File
     `solution.pdf` will be generated.
 
   - `stats.csv`: CSV file containing statistical information about the
@@ -135,7 +135,7 @@ Pack-U produces several files for output information:
     items*, `TCA` is the *total area of the containers*, `TIA` is the
     *total area of the items*, `WR` is the *waste ratio* in percents
     (100 * (TCA / TIA - 1)) and `CPU` is the *CPU time* in
-    miliseconds.
+    milliseconds.
 
 The solution obtained for the above problem is
 
@@ -168,7 +168,7 @@ containers must be related. The idea is that an item of type with *id*
 
 Let's recall the [full example](#setting) above and insert some
 *id*s. In this new example, items of type 1 can only be packed into
-containers of type 2 (smalles containers).
+containers of type 2 (smallest containers).
 
   - `containers.txt`:
 
@@ -191,6 +191,35 @@ containers of type 2 (smalles containers).
         0
         70
 
+The solution obtained for the above problem is
+
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    1,    0,    0,    0,   20,
+    1,    0,    0,    0,   20,
+    1,    0,    0,    0,   20,
+    2,   20,    0,    0,    2,
+    1,    0,   20,    0,    8,
+
+and the images generated are
+
+![][id_sol01] ![][id_sol02] ![][id_sol03]
+![][id_sol04] ![][id_sol05] ![][id_sol06]
+![][id_sol07] ![][id_sol08] ![][id_sol09]
+![][id_sol10] ![][id_sol11] ![][id_sol12]
+![][id_sol13] ![][id_sol14] ![][id_sol15]
+
+We can see that the red items are not packed into the larger
+containers. On the other hand, the other items (for example, the
+purple ones) can were packed into both containers.
 
 ## Solver configuration
 
@@ -229,5 +258,21 @@ executable is run:
 [sol6]: docs/images/sol6.png
 [sol7]: docs/images/sol7.png
 [sol8]: docs/images/sol8.png
+
+[id_sol01]: docs/images/sol001.png
+[id_sol02]: docs/images/sol002.png
+[id_sol03]: docs/images/sol003.png
+[id_sol04]: docs/images/sol004.png
+[id_sol05]: docs/images/sol005.png
+[id_sol06]: docs/images/sol006.png
+[id_sol07]: docs/images/sol007.png
+[id_sol08]: docs/images/sol008.png
+[id_sol09]: docs/images/sol009.png
+[id_sol10]: docs/images/sol010.png
+[id_sol11]: docs/images/sol011.png
+[id_sol12]: docs/images/sol012.png
+[id_sol13]: docs/images/sol013.png
+[id_sol14]: docs/images/sol014.png
+[id_sol15]: docs/images/sol015.png
 
 [algencan]: http://www.ime.usp.br/~egbirgin/tango
