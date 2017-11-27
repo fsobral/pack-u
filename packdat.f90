@@ -8,6 +8,8 @@ module packdat
   integer :: nItems
   ! Current container's dimensions
   real(8) :: cLength, cWidth
+  ! Current container's id
+  integer :: cId
 
   ! PRIVATE PARAMETERS
 
@@ -39,34 +41,41 @@ module packdat
 
   ! Container's type
   integer, allocatable :: cType(:)
+  !Container's id
+  integer, allocatable :: cId_(:)
   ! Container's dimensions
   real(8), target, allocatable :: cLength_(:)
   real(8), target, allocatable :: cWidth_(:)
   ! Item's type
-  integer, pointer :: iType(:)
+  integer, pointer :: iType(:) => NULL()
   integer, target, allocatable :: iType_(:)
   ! Item's number
-  integer, pointer :: iNumber(:)
+  integer, pointer :: iNumber(:) => NULL()
   integer, target, allocatable :: iNumber_(:)
   ! Item's dimensions
   real(8), target, allocatable :: iLength_(:)
   real(8), target, allocatable :: iWidth_(:)
-
+  !Item's Id
+  integer, target, allocatable :: iId_(:)
   ! Maximum number of items in the largest Container
   integer, allocatable :: maxItems(:)
   ! Type of container for each type of item
   integer, allocatable :: contType(:)
 
   ! Types of containers used
-  integer, pointer :: cTypeUsed_(:)
+  integer, allocatable :: cTypeUsed_(:)
   ! Index to the items in the container
-  integer, pointer :: cStartEnd_(:)
+  integer, allocatable :: cStartEnd_(:)
 
   ! COMMON ARRAYS
 
   ! Pointer to current item's dimensions
-  real(8), pointer :: iLength(:), iWidth(:)
+  real(8), pointer :: iLength(:) => NULL(), iWidth(:) => NULL()
 
+  ! Pointer Id for containers and items
+  ! TODO: check if iId must be public
+  integer, pointer :: iId(:) => NULL()
+  
   private
 
   public :: iLength, iWidth, cLength, cWidth, nItems, nTItems,    &
@@ -74,7 +83,8 @@ module packdat
             initialpoint, loadData, drawSol, extractBoxes,        &
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
-            saveSol
+            saveSol, reset, cId, iId, sortContainers, &
+            getAvContainers, setMaxItems_
 
 contains
 
@@ -283,6 +293,8 @@ contains
 
     cLength = cLength_(c)
 
+    cId = cId_(c)
+
   end subroutine setCurrContainer
 
 ! ******************************************************************
@@ -341,7 +353,7 @@ contains
 
              c = c + 1
 
-             call swap(x, iWidth, iLength, iType, iNumber, i, c)
+             call swap(x, iWidth, iLength, iType, iNumber,iId, i, c)
 
           end if
 
@@ -473,20 +485,26 @@ contains
     real(8), intent(inout) :: x(:)
 
     ! LOCAL SCALARS
-    integer :: i, j, min_j
+    integer :: i, j, min_j,k
     real(8) :: curr_area, min_area    
-    
+    !I tried change the priority
+!!$    do k=nContainers,1,-1
+!!$    
     do i = 1, nItems - 1
 
+!!$       		if ( iId(i) .eq. cId_(k)) then
+!!$
        min_area = iWidth(i) * iLength(i)
 
        min_j    = i
-
+       
        do j = i + 1, nItems
 
           curr_area = iWidth(j) * iLength(j)
 
-          if ( curr_area .le. min_area ) then
+          if ( (iId(j) .lt. iId(min_j)) .or. &
+               ((iId(j) .eq. iId(min_j)) .and. &
+                (curr_area .le. min_area)) ) then
 
              min_area = curr_area
 
@@ -498,12 +516,16 @@ contains
 
        if ( min_j .ne. i ) then
           
-          call swap(x, iWidth, iLength, iType, iNumber, i, min_j)
+          call swap(x, iWidth, iLength, iType, iNumber, iId, i, min_j)
 
        end if
+!!$
+!!$	       end if
 
     end do
 
+!!$    end do
+!!$
   end subroutine sortItems
 
 ! ******************************************************************
@@ -625,31 +647,62 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine setMaxItems(itemType, itemL, itemW)
+  subroutine setMaxItems_(itemId, itemL, itemW, c, nItms)
 
-    ! This subroutine calculates the maximum number of items of type
-    ! 'itemType' that can be packed onto the largest container. It
-    ! automatically initializes internal vectors 'maxItems' and
-    ! 'contType'.
+    ! This subroutine calculates the maximum number of items of the
+    ! given size and 'itemId' that can be packed onto the largest
+    ! available container.
 
     implicit none
 
     ! SCALAR ARGUMENTS
-    integer, intent(in) :: itemType
-    real(kind=8), intent(in) :: itemL, itemW
+    integer :: itemId, c, nItms
+    real(kind=8) :: itemL, itemW
 
-    ! LOCAL SCALARS
-    integer :: maxW, maxL
+    intent(in ) :: itemId, itemL, itemW
+    intent(out) :: c, nItms
 
-    maxW = INT(cWidth_(1) / itemW)
-
-    maxL = INT(cLength_(1) / itemL)
+    ! LOCAL ARRAYS
+    integer :: lC(nContainers)
     
-    maxItems(itemType) = maxW * maxL
+    ! LOCAL SCALARS
+    integer :: i, cntrn, maxW, maxL
 
-    contType(itemType) = 1
+    do i = 1, nContainers
+       
+       lC(i) = i
+       
+    end do
 
-  end subroutine setMaxItems
+    call sortContainers(nContainers, lC)
+
+    c = - 1
+
+    nItms = 0
+    
+    do i = nContainers, 1, -1
+
+       cntrn = lC(i)
+       
+       if ( itemId .le. cId_(cntrn) ) then
+
+          maxW = AINT(cWidth_(cntrn) / itemW)
+
+          maxL = AINT(cLength_(cntrn) / itemL)
+          
+          if ( maxW * maxL .gt. nItms ) then
+    
+             nItms = maxW * maxL
+
+             c = cntrn
+
+          end if
+
+       end if
+
+    end do
+
+  end subroutine setMaxItems_
 
 ! ******************************************************************
 ! ******************************************************************
@@ -665,11 +718,11 @@ contains
     implicit none
 
     ! LOCAL SCALARS
-    integer :: i, t, iprev
+    integer :: i, t, iprev, k
     character(80) :: filename
 
     ! LOCAL ARRAYS
-    integer, allocatable :: types(:)
+    integer, allocatable :: types(:),tId(:), tcl(:)
     real(8), allocatable :: tW(:), tL(:)
 
     ! Container data
@@ -678,16 +731,54 @@ contains
 
     read(99, *) nContainers
 
-    allocate(clength_(nContainers), cWidth_(nContainers))
+    allocate(clength_(nContainers), cWidth_(nContainers), cId_(nContainers), &
+             tcl(nContainers))
 
     do i = 1, nContainers
 
-       read(99, *) cLength_(i), cWidth_(i)
+       read(99, *) cLength_(i), cWidth_(i), cId_(i)
+
+       tcl(i) = i
 
     end do
 
     close(99)
 
+!!$    ! Sort containers according to our rules.
+!!$    !
+!!$    !I don't know if this is a good idea. It can save some
+!!$    ! computation, but should be discussed.
+!!$    
+!!$    call sortContainers(nContainers, tcl)
+!!$
+!!$    do i = 1, nContainers
+!!$
+!!$       if (tcl(i) .eq. i) continue
+!!$
+!!$       call dswap(cLength_, i, tcl(i))
+!!$
+!!$       call dswap(cWidth_, i, tcl(i))
+!!$
+!!$       call iswap(cId_, i, tcl(i))
+!!$
+!!$       ! Since each position of 'tcl' is the position (AND identifier)
+!!$       ! of a container, when the container moves, due a swap, we have
+!!$       ! to change its index in 'tcl'. This should be done just here, because
+!!$       ! we are changing the real container's properties.
+!!$       do k = i + 1, nContainers
+!!$
+!!$          if (tcl(k) .eq. i) then
+!!$
+!!$             tcl(k) = tcl(i)
+!!$
+!!$             exit
+!!$
+!!$          end if             
+!!$
+!!$       end do         
+!!$
+!!$    end do
+    
     currContainer = 1
     
     ! Item data
@@ -698,16 +789,29 @@ contains
 
     ! TODO: test allocation error
     allocate(types(nTypes), tL(nTypes), tW(nTypes), maxItems(nTypes), &
-             contType(nTypes))
+             contType(nTypes), tId(nTypes))
 
     ! Load items sizes and initializes the maximum number of items in
     ! the largest container
+    ! We inserted the iId input here. Note that the weight option 
+    ! was excluded
+
     do t = 1, nTypes
 
-       read(99, *) tL(t), tW(t)
+       read(99, *) tL(t), tW(t), tId(t)
 
-       call setMaxItems(t, tL(t), tW(t))
+       call setMaxItems_(tId(t), tL(t), tW(t), &
+                         contType(t), maxItems(t))
+       
+       ! TODO: make loadData return an error flag.
+       if ( contType(t) .eq. -1 ) then
 
+          write(*, *) "ERROR: Item without container."
+
+          stop
+
+       end if
+       
     end do
 
     close(99)
@@ -738,7 +842,8 @@ contains
 
     ! TODO: test allocation error
     allocate(iType_(nTItems), iLength_(nTItems), iWidth_(nTItems), &
-             iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems))
+             iNumber_(nTItems), cTypeUsed_(nTItems), cStartEnd_(nTItems),&
+             iId_(nTItems))
 
     iprev = 1
 
@@ -754,6 +859,8 @@ contains
 
           iWidth_(i) = tW(t)
 
+          iId_(i)=tId(t)
+
        end do
 
        iprev = iprev + types(t)
@@ -762,6 +869,36 @@ contains
 
     call updateCurrItems(1, nTItems)
 
+! For testing if the input was read we create a file called testing.txt 
+! TODO : test setup error
+
+open(10,FILE='testing.txt')
+
+write(10,*) 'Container id'
+
+    do i =1, nContainers
+
+      write(10,*) cId_(i)
+    
+    end do
+    
+    write(10,*) 'Item Id in list ', ' |   type   | ', ' |   id   |'
+
+    k=1
+
+    do t=1, nTypes
+
+        do i=1, types(t)
+
+          write(10,*) 'item type ', t, iId_(k)
+
+          k=k+1
+
+        end do
+
+    end do
+
+close(10)
 !!$    iini = 1
 !!$
 !!$    iend = nTItems
@@ -778,7 +915,7 @@ contains
 !!$
 !!$    iWidth  =>  iWidth_(iini:iend)
 
-    deallocate(types, tL, tW)
+    deallocate(types, tL, tW, tId, tcl)
 
   end subroutine loadData
 
@@ -860,7 +997,7 @@ contains
 
        write(*,*) 'Appending item', iNumber_(item)
 
-       call swap(x, iWidth_, iLength_, iType_, iNumber_, item, iend + 1)
+       call swap(x, iWidth_, iLength_, iType_, iNumber_,iId_ ,item, iend + 1)
 
        call updateCurrItems(iini, iend + 1)
 
@@ -937,7 +1074,7 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine swap(x, vw, vl, vt, vn, it1, it2)
+  subroutine swap(x, vw, vl, vt, vn,vid,it1, it2)
 
     ! Swaps positions related to items it1 and it2 in real vectors vw,
     ! vl and integer vectors vt, vn
@@ -949,10 +1086,10 @@ contains
 
     ! ARRAY ARGUMENTS
     real(8) :: vw(:), vl(:), x(:)
-    integer :: vt(:), vn(:)
+    integer :: vt(:), vn(:),vid(:)
 
     intent(in   ) :: it1, it2
-    intent(inout) :: vw, vl, vt, vn, x
+    intent(inout) :: vw, vl, vt, vn, x,vid
 
     ! LOCAL SCALARS
     integer :: itmp
@@ -971,6 +1108,8 @@ contains
     call iswap(vt, it1, it2)
 
     call iswap(vn, it1, it2)
+
+	call iswap(vid,it1, it2)
 
   end subroutine swap
 
@@ -1004,7 +1143,7 @@ contains
 
           write(*,*) 'Item', iNumber(i)
 
-          call swap(x, iLength, iWidth, iType, iNumber, pos, i)
+          call swap(x, iLength, iWidth, iType, iNumber,iId, pos, i)
 
           pos = pos + 1
 
@@ -1026,7 +1165,7 @@ contains
 
              write(*, *) 'Detected overlapping between', iNumber(i), 'and', iNumber(j)
 
-             call swap(x, iLength, iWidth, iType, iNumber, i, pos)
+             call swap(x, iLength, iWidth, iType, iNumber,iId, i, pos)
 
              pos = pos - 1
 
@@ -1125,6 +1264,8 @@ contains
     iWidth  => iWidth_(iini:iend)
 
     iLength => iLength_(iini:iend)
+
+	iId =>iId_(iini:iend) 
 
   end subroutine updateCurrItems
 
@@ -1252,5 +1393,171 @@ contains
             ', cor(',I2,'), currentpen, "', I4, '");')
 
   end subroutine drawSol
+  
+! ******************************************************************
+! ******************************************************************
 
+  subroutine sortContainers(size, list)
+
+    ! This subroutine returns in 'list' the number of the containers
+    ! in a non-decreasing order of importance.
+    
+    implicit none
+    
+    ! SCALAR ARGUMENTS
+    integer :: size
+
+    ! ARRAY ARGUMENTS
+    integer :: list(size)
+
+    intent(in   ) :: size
+    intent(inout) :: list
+
+    ! LOCAL SCALARS
+    integer :: i, j, tmp, minI, minC, currC
+
+    do i = 1, size
+
+       minI = i
+
+       minC = list(i)
+    
+       do j = i + 1, size
+       
+          currC = list(j)
+       
+          ! Select the smallest and least important container
+
+          if ( (cId_(currC) .lt. cId_(minC)) .or. &
+               ( (cId_(currC) .eq. cId_(minC)) .and. &
+               (cWidth_(currC) * cLength_(currC)) .lt. &
+               (cWidth_(minC) * cLength_(minC))) ) then
+
+             minC = currC
+
+             minI = j
+
+          end if
+
+       end do
+
+       if ( i .ne. minI ) then
+
+          tmp = list(i)
+
+          list(i) = list(minI)
+
+          list(minI) = tmp
+
+       end if
+
+    end do
+
+  end subroutine sortContainers
+  
+! ******************************************************************
+! ******************************************************************
+
+  subroutine getAvContainers(L, n)
+
+    ! This subroutine returns in 'L' the number of the containers that
+    ! can be used to pack the current types of items. The containers
+    ! in 'L' are sorted according to our sorting rules.
+    !
+    ! The criterium used is the item's and container's ID. An item can
+    ! be packed inside a container if the container's ID is greater or
+    ! equal than the item's ID.
+
+    ! SCALAR ARGUMENTS
+    integer :: n
+
+    ! ARRAY ARGUMENTS
+    integer :: L(:)
+
+    intent(out) :: n, L
+
+    ! LOCAL SCALARS
+    integer :: i, j
+    logical :: remove
+
+    n = 0
+    
+    do j = 1, nContainers
+
+       ! Try to insert container j in the list
+       L(n + 1) = j
+
+       remove = .false.
+       
+       do i = 1, nItems
+
+          ! If there is an item which cannot be packed inside
+          ! container j, then remove it from the list
+          if (cId_(j) .lt. iId(i)) then
+
+             remove = .true.
+
+             exit
+
+          end if
+
+       end do
+
+       if (.not. remove) n = n + 1
+       
+    end do
+
+    call sortContainers(n, L)
+    
+  end subroutine getAvContainers
+  
+! ******************************************************************
+! ******************************************************************
+
+  subroutine reset()
+
+    ! This subroutine deallocates all vectors and deassociates all
+    ! the pointers
+    !
+    ! TODO: test deallocation errors.
+    ! TODO: test if was allocated!
+
+    ! deallocate(cType)
+
+    if ( allocated(cLength_) ) deallocate(cLength_)
+    
+    if ( allocated(cWidth_) ) deallocate(cWidth_)
+    
+    if ( allocated(iType_) ) deallocate(iType_)
+    
+    if ( allocated(iNumber_) ) deallocate(iNumber_)
+    
+    if ( allocated(iLength_) ) deallocate(iLength_)
+    
+    if ( allocated(iWidth_) ) deallocate(iWidth_)
+    
+    if ( allocated(maxItems) ) deallocate(maxItems)
+    
+    if ( allocated(contType) ) deallocate(contType)
+    
+    if ( allocated(cTypeUsed_) ) deallocate(cTypeUsed_)
+    
+    if ( allocated(cStartEnd_) ) deallocate(cStartEnd_)
+    
+    if ( allocated(cId_) ) deallocate(cId_)
+    
+    if ( allocated(iId_) ) deallocate(iId_)
+    
+    iType => NULL()
+
+    iNumber => NULL()
+
+    iLength => NULL()
+
+    iWidth => NULL()
+
+    iId => NULL()
+
+  end subroutine reset
+  
 end module packdat
