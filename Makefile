@@ -6,6 +6,7 @@ PACKPROBLEM = packminc
 
 PACKUDIR = $(CURDIR)
 BUILDDIR = $(PACKUDIR)/build
+SRCDIR = $(PACKUDIR)/src
 TESTDIR = $(PACKUDIR)/tests
 
 # Compiler options
@@ -54,3 +55,4 @@ clean:
 	rm -f *.mod *.o *.a solution.csv solution.pdf \
 	sol[0-9][0-9][0-9].* build/*
 	$(MAKE) -C $(TESTDIR) clean
+	$(MAKE) -C $(SRCDIR) clean
