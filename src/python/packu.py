@@ -25,20 +25,11 @@ class Item:
         return False
 
 
-class Container:
+class Container(Item):
 
     def __init__(self, cle, cwi, cid):
 
-        self.length_ = cle
-
-        self.width_ = cwi
-
-        self.id_ = cid
-
-    def __str__(self):
-
-        return "{0:5.2f} {1:5.2f} {2:3d}".format(
-            self.length_, self.width_, self.id_)
+        super().__init__(cle, cwi, cid)
 
     def how_many_items(self, item):
 
@@ -62,7 +53,7 @@ def parse_items_files(filename):
 
     nItemsTypes = 0
 
-    item_lists = []
+    item_list = []
 
     with open(filename, "r") as fp:
 
@@ -95,7 +86,7 @@ def parse_items_files(filename):
 
                     print("Created item " + str(item))
 
-                    item_lists.append(item)
+                    item_list.append(item)
 
                 except Exception as e:
 
@@ -104,4 +95,4 @@ def parse_items_files(filename):
 
                     break
 
-        return item_lists
+        return item_list

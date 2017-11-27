@@ -60,7 +60,7 @@ fruit_driver_gen.f90 : $(TESTS_CODE)
 
 pythontests:
 	export PYTHONPATH=$(PYTHONPATH):$(PACKUDIR)/src/python; \
-	       python packu_tests.py
+	       python3 packu_tests.py
 
 clean : 
 	rm -f *.o *.mod *.obj *.bin
