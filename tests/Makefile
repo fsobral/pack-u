@@ -16,7 +16,7 @@
 #
 
 # TODO: Move this variables to an upper Makefile
-BUILD = ../
+BUILD = $(PACKUDIR)
 
 FC = gfortran
 

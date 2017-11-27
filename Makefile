@@ -12,7 +12,7 @@ TESTDIR = $(PACKUDIR)/tests
 
 CC  = gcc
 FC  = gfortran
-FCC = 
+FCC = -O2
 
 export
 
@@ -26,8 +26,10 @@ packu: $(PACKPROBLEM).o packdat.o
 	mkdir -p $(BUILDDIR)
 	mv -f $@ $(BUILDDIR)/.
 
-tests: lib
+tests: lib python_tests
 	$(MAKE) -C $(TESTDIR) clean run
+
+python_tests:
 	$(MAKE) -C $(TESTDIR) pythontests
 
 %.o: %.f90
