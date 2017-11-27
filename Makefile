@@ -1,4 +1,4 @@
-TANGOLIB = /opt/tango/algencan-3.0.0/lib
+TANGOLIB = /home/emerson/Documentos/algencan-3.1.1/lib/
 
 PACKPROBLEM = packminc
 
