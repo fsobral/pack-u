@@ -44,30 +44,32 @@ To build Pack-U you need to
 The generated file is located in the path given by `BUILDDIR`
 variable, which is `build/` by default.
 
-## Setting up your problem
+## Setting up your problem <A ID="setting"></A>
 
 Pack-U needs 3 files to solve a packing problem:
 
   - `containers.txt`: the type of containers that can be used. The
     first line contains the **number** of different containers. Each
-    remaining line contains the **length** and **width** of each
-    container, from the largest area to the smallest one. The
-    following example illustrates the case of 2 containers:
+    remaining line contains the **length**, **width** and **id** of
+    each container. The following example illustrates the case of 2
+    containers with the same *id* (the use of *id*s is explained
+    [here](#ID)):
 
 		2
-		40.0 30.0
-		28.5 17.5
+		40.0 30.0 0
+		28.5 17.5 0
 
   - `items.txt`: the type of items that can be packed. The first line
-    contains the **number** of different items. Each remaining line
-    contains a triple: **width**, **height** and **weight** (not used
-    yet). The following example illustrates the case of 4 items:
+    contains the **number** of different types of items. Each
+    remaining line contains a triple: **width**, **height** and
+    **id**. The following example illustrates the case of 4 items with
+    the same *id* (the use of *id*s is explained [here](#ID)):
 
         4
-        4 4 50
-        5.7 5.7 200
-        5.7 5.7 100
-        7.5 7.5 500   
+        4 4 0
+        5.7 5.7 0
+        5.7 5.7 0
+        7.5 7.5 0
 
   - `data.txt`: the **number items of each type** to be packed. It has
     the same number of lines as the number of type of items in the
@@ -83,7 +85,7 @@ often, since they represent all the available items and
 containers. Each packing problem consists of a different `data.txt`
 file.
 
-**Important**: All the unit measures must be the same.
+**Important**: All the unit measures for sizes must be the same.
 
 ## Running
 
@@ -121,7 +123,7 @@ Pack-U produces several files for output information:
         cp ../packlib.asy
         ../scripts/makepdf.sh
 
-    Be carefull, since this script removes all ASY files. File
+    Be careful, since this script removes all ASY files. File
     `solution.pdf` will be generated.
 
   - `stats.csv`: CSV file containing statistical information about the
@@ -133,7 +135,7 @@ Pack-U produces several files for output information:
     items*, `TCA` is the *total area of the containers*, `TIA` is the
     *total area of the items*, `WR` is the *waste ratio* in percents
     (100 * (TCA / TIA - 1)) and `CPU` is the *CPU time* in
-    miliseconds.
+    milliseconds.
 
 The solution obtained for the above problem is
 
@@ -152,6 +154,72 @@ and the images generated are
 ![][sol0] ![][sol1] ![][sol2]
 ![][sol3] ![][sol4] ![][sol5]
 ![][sol6] ![][sol7] ![][sol8]
+
+## The *id* parameter <A ID="ID"></A>
+
+The *id* parameter was introduced to describe which items can be
+placed in which containers. Thus, the *id*s of item types and
+containers must be related. The idea is that an item of type with *id*
+`X` can be packed into containers of *id* `Y` if and only if `Y >= X`.
+
+> For example, items with *id* `1` can be packed into containers of
+> *id* `1` and `2`, but **cannot** be packed into container with *id*
+> `0`!
+
+Let's recall the [full example](#setting) above and insert some
+*id*s. In this new example, items of type 1 can only be packed into
+containers of type 2 (smallest containers).
+
+  - `containers.txt`:
+
+        2
+       	40.0 30.0 0
+        28.5 17.5 1
+
+  - `items.txt`:
+
+        4
+        4 4 1
+        5.7 5.7 0
+        5.7 5.7 0
+        7.5 7.5 0
+
+  - `data.txt`:
+
+        300
+        20
+        0
+        70
+
+The solution obtained for the above problem is
+
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    2,   28,    0,    0,    0,
+    1,    0,    0,    0,   20,
+    1,    0,    0,    0,   20,
+    1,    0,    0,    0,   20,
+    2,   20,    0,    0,    2,
+    1,    0,   20,    0,    8,
+
+and the images generated are
+
+![][id_sol01] ![][id_sol02] ![][id_sol03]
+![][id_sol04] ![][id_sol05] ![][id_sol06]
+![][id_sol07] ![][id_sol08] ![][id_sol09]
+![][id_sol10] ![][id_sol11] ![][id_sol12]
+![][id_sol13] ![][id_sol14] ![][id_sol15]
+
+We can see that the red items are not packed into the larger
+containers. On the other hand, the other items (for example, the
+purple ones) can were packed into both containers.
 
 ## Solver configuration
 
@@ -173,6 +241,12 @@ executable is run:
 
     touch .silent
 
+## Improvements
+
+  - **November, 2017**: Items and containers have priority
+      identification.
+  - **July, 2017**: First version
+
 [logo]: docs/images/packu-logo.png
 
 [sol0]: docs/images/sol0.png
@@ -184,5 +258,21 @@ executable is run:
 [sol6]: docs/images/sol6.png
 [sol7]: docs/images/sol7.png
 [sol8]: docs/images/sol8.png
+
+[id_sol01]: docs/images/id_sol001.png
+[id_sol02]: docs/images/id_sol002.png
+[id_sol03]: docs/images/id_sol003.png
+[id_sol04]: docs/images/id_sol004.png
+[id_sol05]: docs/images/id_sol005.png
+[id_sol06]: docs/images/id_sol006.png
+[id_sol07]: docs/images/id_sol007.png
+[id_sol08]: docs/images/id_sol008.png
+[id_sol09]: docs/images/id_sol009.png
+[id_sol10]: docs/images/id_sol010.png
+[id_sol11]: docs/images/id_sol011.png
+[id_sol12]: docs/images/id_sol012.png
+[id_sol13]: docs/images/id_sol013.png
+[id_sol14]: docs/images/id_sol014.png
+[id_sol15]: docs/images/id_sol015.png
 
 [algencan]: http://www.ime.usp.br/~egbirgin/tango

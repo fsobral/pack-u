@@ -1,7 +1,8 @@
 *.mod
 *.o
 *.a
-*.txt
+*.pyc
+/*.txt
 *~
 sol*.asy
 sol*.csv
@@ -12,6 +13,7 @@ build/*
 tests/fruit*gen.f90
 tests/*.bin
 tests/*.xml
+tests/*.txt
 
 # Algencan files
 .silent

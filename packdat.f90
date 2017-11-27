@@ -84,7 +84,7 @@ module packdat
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
             saveSol, reset, cId, iId, sortContainers, &
-            getAvContainers
+            getAvContainers, setMaxItems_
 
 contains
 
@@ -647,24 +647,26 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  subroutine setMaxItems(itemType, itemId, itemL, itemW)
+  subroutine setMaxItems_(itemId, itemL, itemW, c, nItms)
 
-    ! This subroutine calculates the maximum number of items of type
-    ! 'itemType' that can be packed onto the largest available
-    ! container. It automatically initializes internal vectors
-    ! 'maxItems' and 'contType'.
+    ! This subroutine calculates the maximum number of items of the
+    ! given size and 'itemId' that can be packed onto the largest
+    ! available container.
 
     implicit none
 
     ! SCALAR ARGUMENTS
-    integer, intent(in) :: itemType, itemId
-    real(kind=8), intent(in) :: itemL, itemW
+    integer :: itemId, c, nItms
+    real(kind=8) :: itemL, itemW
+
+    intent(in ) :: itemId, itemL, itemW
+    intent(out) :: c, nItms
 
     ! LOCAL ARRAYS
     integer :: lC(nContainers)
     
     ! LOCAL SCALARS
-    integer :: c, i, maxW, maxL
+    integer :: i, cntrn, maxW, maxL
 
     do i = 1, nContainers
        
@@ -674,27 +676,33 @@ contains
 
     call sortContainers(nContainers, lC)
 
+    c = - 1
+
+    nItms = 0
+    
     do i = nContainers, 1, -1
 
-       c = lC(i)
+       cntrn = lC(i)
        
-       if ( itemId .le. cId_(c) ) then
-       
-          maxW = INT(cWidth_(c) / itemW)
+       if ( itemId .le. cId_(cntrn) ) then
 
-          maxL = INT(cLength_(c) / itemL)
+          maxW = AINT(cWidth_(cntrn) / itemW)
+
+          maxL = AINT(cLength_(cntrn) / itemL)
+          
+          if ( maxW * maxL .gt. nItms ) then
     
-          maxItems(itemType) = maxW * maxL
+             nItms = maxW * maxL
 
-          contType(itemType) = c
+             c = cntrn
 
-          exit
+          end if
 
        end if
 
     end do
 
-  end subroutine setMaxItems
+  end subroutine setMaxItems_
 
 ! ******************************************************************
 ! ******************************************************************
@@ -792,8 +800,18 @@ contains
 
        read(99, *) tL(t), tW(t), tId(t)
 
-       call setMaxItems(t, tId(t), tL(t), tW(t))
+       call setMaxItems_(tId(t), tL(t), tW(t), &
+                         contType(t), maxItems(t))
+       
+       ! TODO: make loadData return an error flag.
+       if ( contType(t) .eq. -1 ) then
 
+          write(*, *) "ERROR: Item without container."
+
+          stop
+
+       end if
+       
     end do
 
     close(99)

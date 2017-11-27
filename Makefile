@@ -6,13 +6,16 @@ PACKPROBLEM = packminc
 
 PACKUDIR = $(CURDIR)
 BUILDDIR = $(PACKUDIR)/build
+SRCDIR = $(PACKUDIR)/src
 TESTDIR = $(PACKUDIR)/tests
 
 # Compiler options
 
 CC  = gcc
 FC  = gfortran
-FCC = 
+FCC = -O2
+
+export
 
 lib: libpacku.a
 
@@ -24,8 +27,11 @@ packu: $(PACKPROBLEM).o packdat.o
 	mkdir -p $(BUILDDIR)
 	mv -f $@ $(BUILDDIR)/.
 
-tests: lib
+tests: lib python_tests
 	$(MAKE) -C $(TESTDIR) clean run
+
+python_tests:
+	$(MAKE) -C $(TESTDIR) pythontests
 
 %.o: %.f90
 	gfortran -c $^
@@ -46,6 +52,7 @@ containers.mod: containers.f90 items.mod
 	gfortran -c $<
 
 clean:
-	rm -f *.mod *.o solution.csv solution.pdf \
+	rm -f *.mod *.o *.a solution.csv solution.pdf \
 	sol[0-9][0-9][0-9].* build/*
 	$(MAKE) -C $(TESTDIR) clean
+	$(MAKE) -C $(SRCDIR) clean

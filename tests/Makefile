@@ -16,7 +16,7 @@
 #
 
 # TODO: Move this variables to an upper Makefile
-BUILD = ../
+BUILD = $(PACKUDIR)
 
 FC = gfortran
 
@@ -57,6 +57,10 @@ fruit_driver_gen.f90 : $(TESTS_CODE)
 
 # fruit_driver_gen.o: fruit_driver_gen.f90
 # 	$(FC) $(FOPT) -c $<
+
+pythontests:
+	export PYTHONPATH=$(PYTHONPATH):$(PACKUDIR)/src/python; \
+	       python3 packu_tests.py
 
 clean : 
 	rm -f *.o *.mod *.obj *.bin
