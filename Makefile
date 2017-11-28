@@ -1,6 +1,23 @@
-TANGOLIB = /home/emerson/Documentos/algencan-3.1.1/lib/
+# Configuration variables
 
 PACKPROBLEM = packminc
+
+TANGOLIB = 
+
+# Create or modify the file below to set user-defined variables or
+# change the above-defined variables
+
+-include user_variables.mk
+
+# Compiler options
+
+CC  = gcc
+FC  = gfortran
+FCC = -O2
+
+###########################################
+# Modify below only if you are an expert! #
+###########################################
 
 # Directories
 
@@ -8,12 +25,6 @@ PACKUDIR = $(CURDIR)
 BUILDDIR = $(PACKUDIR)/build
 SRCDIR = $(PACKUDIR)/src
 TESTDIR = $(PACKUDIR)/tests
-
-# Compiler options
-
-CC  = gcc
-FC  = gfortran
-FCC = -O2
 
 export
 
