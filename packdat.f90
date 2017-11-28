@@ -1478,7 +1478,7 @@ close(10)
 
     ! LOCAL SCALARS
     integer :: i, j
-    logical :: remove
+    logical :: remove, sameid
 
     n = 0
     
@@ -1488,6 +1488,8 @@ close(10)
        L(n + 1) = j
 
        remove = .false.
+
+       sameid = .false.
        
        do i = 1, nItems
 
@@ -1501,13 +1503,24 @@ close(10)
 
           end if
 
+          ! Only insert containers whose id was found among the
+          ! available items
+          if (cId_(j) .eq. iId(i)) sameid = .true.
+
        end do
 
-       if (.not. remove) n = n + 1
+       if ((.not. remove) .and. sameid) n = n + 1
        
     end do
 
+    ! TODO: Maybe there is no need to sort containers by id.
     call sortContainers(n, L)
+
+    do i = n + 1, nContainers
+
+       L(i) = 0
+
+    end do
     
   end subroutine getAvContainers
   

@@ -533,7 +533,8 @@ contains
 
     filename = "data.txt"
 
-    ! Test 1 - Single type of item that fits all containers
+    ! Test 1 - Single type of item that fits all containers. By
+    ! design, it should return only the containers with the same ID.
     
     qIt = (/10, 0/)
     
@@ -547,9 +548,9 @@ contains
     
     call getAvContainers(L, nL)
 
-    call assert_equals(3, nL)
+    call assert_equals(2, nL)
 
-    do i = 1, 3
+    do i = 1, 2
 
        hasCntnr = .false.
        
@@ -562,6 +563,8 @@ contains
        call assert_true(hasCntnr, "List without container.")
 
     end do
+
+    call assert_equals(0, L(3))
 
     ! Test 2 - two items, three containers and two ids
 
@@ -578,20 +581,6 @@ contains
     call assert_equals(1, nL)
 
     call assert_equals(3, L(1))
-
-    ! Test 3 - one item and one container, different IDs
-!!$
-!!$    qIt = (/0, 20/)
-!!$    
-!!$    call createFiles(it, 2, cont, 2, qIt)
-!!$    
-!!$    call reset()
-!!$
-!!$    call loadData(filename)
-!!$
-!!$    call getAvContainers(L, nL)
-!!$
-!!$    call assert_equals(0, nL)
 
   end subroutine test_get_available_containers
 
@@ -715,11 +704,11 @@ contains
 
     call getAvContainers(L, nL)
 
+    call assert_equals(2, nL)
+
     call assert_equals(3, L(1), "Unsorted cntnr list.")
 
     call assert_equals(2, L(2), "Unsorted cntnr list.")
-
-    call assert_equals(1, L(3), "Unsorted cntnr list.")
 
   end subroutine test_get_available_containers_is_sorting
 
