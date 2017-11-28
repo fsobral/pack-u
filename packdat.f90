@@ -652,6 +652,9 @@ contains
     ! This subroutine calculates the maximum number of items of the
     ! given size and 'itemId' that can be packed onto the largest
     ! available container.
+    !
+    ! It uses 'itemId' and do not select a container of different id
+    ! of the item.
 
     implicit none
 
@@ -683,8 +686,9 @@ contains
     do i = nContainers, 1, -1
 
        cntrn = lC(i)
-       
-       if ( itemId .le. cId_(cntrn) ) then
+
+       ! TODO: Check if it could be .le.
+       if ( itemId .eq. cId_(cntrn) ) then
 
           maxW = AINT(cWidth_(cntrn) / itemW)
 
