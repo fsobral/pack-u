@@ -219,7 +219,7 @@ and the images generated are
 
 We can see that the red items are not packed into the larger
 containers. On the other hand, the other items (for example, the
-purple ones) can were packed into both containers.
+purple ones) were packed into both containers.
 
 ## Solver configuration
 
