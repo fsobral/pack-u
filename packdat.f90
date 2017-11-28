@@ -324,7 +324,7 @@ contains
 
     numberOfSolutions = 1
 
-    do curr_item = 1,4
+    do curr_item = 1, nTypes
 
        ! Count the number of items
 
