@@ -523,6 +523,89 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
+  recursive subroutine recInitialPoint(itemsOrder, pstart, pend, xo, yo, &
+       width, length, x, nPlaced)
+
+    ! SCALAR ARGUMENTS
+    integer, intent(out) :: nPlaced
+    integer, intent(in) :: pstart, pend
+    real(8), intent(in) :: xo, yo, width, length
+
+    ! ARRAY ARGUMENTS
+    integer, intent(in ) :: itemsOrder(:)
+    real(8), intent(out) :: x(:)
+
+    ! LOCAL SCALARS
+    integer :: i, j, howMany
+    real(8) :: dx, dy, prevLen
+
+    nPlaced = 0
+    
+    ! Return if there is no more items
+    if ( pstart .gt. pend ) return
+
+    dy = xo
+
+    dx = yo
+
+    prevLen = iLength(itemsOrder(pstart))
+
+    i = pstart
+    
+    do while ( i .le. pend )
+
+       j = itemsOrder(i)
+
+       write(*,*) 'Inserted', j
+       
+       ! Never enter in the first iteration
+       if ( iLength(j) .ne. prevLen ) then
+
+          write(*,*) 'Smaller found. Reducing...'
+          
+          call recInitialPoint(itemsOrder, i, pend, dx, dy, &
+               width, dx + prevLen, x, howMany)
+
+          nPlaced = nPlaced + howMany
+          
+          i = i + howMany
+
+       end if
+
+       prevLen = iLength(j)
+             
+       ! TODO: Think about the case when the width is small for the
+       ! first item.
+       if ( dy + iWidth(j) .gt. width ) then 
+
+          ! Return if the next item does not fit in the new column.
+          if ( dx + iLength(j) .gt. length ) return
+          
+          dx = dx + iLength(j)
+
+          dy = yo
+
+       end if
+
+       x(2 * (j - 1) + 1) = dx
+       
+       x(2 * j) = dy
+
+       dy = dy + iWidth(j)
+
+       i = i + 1
+
+       nPlaced = nPlaced + 1
+
+    end do
+
+    write(*,*) 'Placed', nPlaced
+    
+  end subroutine recInitialPoint
+  
+! ******************************************************************
+! ******************************************************************
+
   subroutine initialpoint(x, s, strip)
 
     ! This subroutine sets up an random initial position of the items,
@@ -549,7 +632,7 @@ contains
 
     ! LOCAL SCALARS
     integer :: i, j, nseed, itmp, ri
-    real(8) :: rnumber, cl, maxd, dx, dy
+    real(8) :: rnumber, cl, dx, dy, nextx, nexty, maxdx
 
     ! LOCAL ARRAYS
     integer, allocatable :: seed(:), ritems(:)
@@ -600,39 +683,12 @@ contains
 
     dx = 0.0D0
 
-    maxd = 0.0D0
+    call recInitialPoint(rItems, 1, nItems, dx, dy, &
+         cWidth, 10.0D0 * cLength, x, itmp)
 
-    do i = 1, nItems
+    if ( strip ) x(2 * nItems + 1) = x(2 * nItems - 1)
 
-       j = rItems(i)
-
-       if ( dy + iWidth(j) .gt. cWidth ) then 
-
-          call random_number(rnumber)
-
-          dx = dx + maxd
-
-          dy = 0.0D0
-
-          maxd = 0.0D0
-
-       end if
-
-       x(2 * (j - 1) + 1) = dx
-       
-       x(2 * j) = dy
-
-       call random_number(rnumber)
-
-       dy = dy + iWidth(j)
-
-       maxd = max(maxd, iLength(j))
-
-    end do
-
-    if ( strip ) x(2 * nItems + 1) = dx + maxd
-
-    deallocate(ritems)
+    deallocate(rItems)
 
   end subroutine initialpoint
 
