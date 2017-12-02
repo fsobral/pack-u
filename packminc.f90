@@ -84,6 +84,8 @@ program algencanma
      
   end if
 
+  ! Start of main loop
+  
   call getAvContainers(lCntnr, nCntnr)
   
   lastContainer = 1

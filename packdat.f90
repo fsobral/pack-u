@@ -487,13 +487,9 @@ contains
     ! LOCAL SCALARS
     integer :: i, j, min_j,k
     real(8) :: curr_area, min_area    
-    !I tried change the priority
-!!$    do k=nContainers,1,-1
-!!$    
+
     do i = 1, nItems - 1
 
-!!$       		if ( iId(i) .eq. cId_(k)) then
-!!$
        min_area = iWidth(i) * iLength(i)
 
        min_j    = i
@@ -519,13 +515,9 @@ contains
           call swap(x, iWidth, iLength, iType, iNumber, iId, i, min_j)
 
        end if
-!!$
-!!$	       end if
 
     end do
 
-!!$    end do
-!!$
   end subroutine sortItems
 
 ! ******************************************************************
@@ -873,51 +865,36 @@ contains
 
     call updateCurrItems(1, nTItems)
 
-! For testing if the input was read we create a file called testing.txt 
-! TODO : test setup error
+    ! For testing if the input was read we create a file called testing.txt 
+    ! TODO : test setup error
+    
+    open(10,FILE='testing.txt')
 
-open(10,FILE='testing.txt')
-
-write(10,*) 'Container id'
+    write(10,*) 'Container id'
 
     do i =1, nContainers
 
-      write(10,*) cId_(i)
-    
+       write(10,*) cId_(i)
+
     end do
-    
+
     write(10,*) 'Item Id in list ', ' |   type   | ', ' |   id   |'
 
     k=1
 
     do t=1, nTypes
 
-        do i=1, types(t)
+       do i=1, types(t)
 
           write(10,*) 'item type ', t, iId_(k)
 
           k=k+1
 
-        end do
+       end do
 
     end do
 
-close(10)
-!!$    iini = 1
-!!$
-!!$    iend = nTItems
-!!$
-!!$    nItems = nTItems
-!!$
-!!$    ! Initialize common pointers
-!!$
-!!$    iType   => iType_(iini:iend)
-!!$
-!!$    iNumber => iNumber_(iini:iend)
-!!$
-!!$    iLength => iLength_(iini:iend)
-!!$
-!!$    iWidth  =>  iWidth_(iini:iend)
+    close(10)
 
     deallocate(types, tL, tW, tId, tcl)
 
@@ -936,18 +913,6 @@ close(10)
     write(*,*) 'Removing item', iNumber(nItems)
 
     call updateCurrItems(iini, iend - 1)
-
-!!$    nItems = nItems - 1
-!!$
-!!$    iend = iend - 1
-!!$
-!!$    iType   => iType_(iini:iend)
-!!$
-!!$    iNumber => iNumber_(iini:iend)
-!!$
-!!$    iWidth  => iWidth_(iini:iend)
-!!$
-!!$    iLength => iLength_(iini:iend)
 
   end subroutine removeAppendedBox
 
@@ -1004,18 +969,6 @@ close(10)
        call swap(x, iWidth_, iLength_, iType_, iNumber_,iId_ ,item, iend + 1)
 
        call updateCurrItems(iini, iend + 1)
-
-!!$       nItems = nItems + 1
-!!$
-!!$       iend = iend + 1
-!!$       
-!!$       iType   => iType_(iini:iend)
-!!$       
-!!$       iNumber => iNumber_(iini:iend)
-!!$       
-!!$       iWidth  => iWidth_(iini:iend)
-!!$       
-!!$       iLength => iLength_(iini:iend)
 
        !write(*,*), iNumber_(item), iNumber(nItems)
 
@@ -1185,18 +1138,6 @@ close(10)
 
     call updateCurrItems(iini, iini + pos - 1)
 
-!!$    nItems = pos
-!!$
-!!$    iend = iini + nItems - 1
-!!$
-!!$    iType   => iType_(iini:iend)
-!!$
-!!$    iNumber => iNumber_(iini:iend)
-!!$
-!!$    iWidth  => iWidth_(iini:iend)
-!!$
-!!$    iLength => iLength_(iini:iend)
-
   end subroutine extractBoxes
 
 ! ******************************************************************
@@ -1223,20 +1164,6 @@ close(10)
        cTypeUsed_(nTContainers) = currContainer
 
     end if
-
-!!$    iini = iini + nit
-!!$
-!!$    iend = nTItems
-!!$
-!!$    nItems = iend - iini + 1
-!!$
-!!$    iType   => iType_(iini:iend)
-!!$
-!!$    iNumber => iNumber_(iini:iend)
-!!$
-!!$    iWidth  => iWidth_(iini:iend)
-!!$
-!!$    iLength => iLength_(iini:iend)
 
     call updateCurrItems(iini + nit, nTItems)
 
@@ -1269,7 +1196,7 @@ close(10)
 
     iLength => iLength_(iini:iend)
 
-	iId =>iId_(iini:iend) 
+    iId =>iId_(iini:iend) 
 
   end subroutine updateCurrItems
 
