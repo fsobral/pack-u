@@ -1,8 +1,49 @@
 #!/usr/bin/python3
 
 import unittest
+import os
 
 from packu import Item, Container, parse_items_files
+
+
+class IntegrationTests(unittest.TestCase):
+
+    def __init__(self, kwargs):
+
+        self.TESTPATH = './'
+
+        super().__init__(kwargs)
+
+    def test_problems(self):
+
+        for t in range(1, 15):
+
+            os.system('cp {0:s}/t{1:d}/*.txt . -v'.format(
+                self.TESTPATH, t))
+
+            os.system('../build/packu')
+
+            with open('solution.csv', 'r') as pfp:
+
+                with open('true_sol.txt', 'r') as tfp:
+
+                    for packu_lines in pfp:
+
+                        a = packu_lines.split(',')
+
+                        b = tfp.readline().split(',')
+
+                        self.assertEqual(
+                            len(b), len(a),
+                            msg='t{0:d}: Different files.'.format(t))
+
+                        for i in range(0, len(a)):
+
+                            self.assertEqual(
+                                b[i].strip(), a[i].strip(),
+                                't{0:d}: Different files.'.format(t))
+
+                    self.assertEqual('', tfp.readline())
 
 
 class TestFileLoader(unittest.TestCase):

@@ -41,7 +41,7 @@ packu: $(PACKPROBLEM).o packdat.o
 tests: lib python_tests
 	$(MAKE) -C $(TESTDIR) clean run
 
-python_tests:
+python_tests: packu
 	$(MAKE) -C $(TESTDIR) pythontests
 
 %.o: %.f90
