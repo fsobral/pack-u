@@ -523,18 +523,28 @@ contains
 ! ******************************************************************
 ! ******************************************************************
 
-  recursive subroutine recInitialPoint(itemsOrder, pstart, pend, xo, yo, &
-       width, length, x, nPlaced)
+  recursive subroutine recInitialPoint(itemsOrder, pstart, pend, &
+       xo, yo, width, length, x, nPlaced)
 
+    ! This subroutine recursivelly tries to pack some items in the
+    ! container given by the dimensions 'width' and 'length'. In the
+    ! first call, the 'length' can be a very large number, in order to
+    ! fit all items, before optimizing.
+    
+    implicit none
+    
     ! SCALAR ARGUMENTS
-    integer, intent(out) :: nPlaced
-    integer, intent(in) :: pstart, pend
-    real(8), intent(in) :: xo, yo, width, length
+    integer :: nPlaced, pstart, pend
+    real(8) :: xo, yo, width, length
 
     ! ARRAY ARGUMENTS
-    integer, intent(in ) :: itemsOrder(:)
-    real(8), intent(out) :: x(:)
+    integer :: itemsOrder(:)
+    real(8) :: x(:)
 
+    intent(in   ) :: itemsOrder, pstart, pend, xo, yo, width, length
+    intent(out  ) :: x
+    intent(inout) :: nPlaced
+    
     ! LOCAL SCALARS
     integer :: i, j, howMany
     real(8) :: dx, dy, prevLen
@@ -544,53 +554,72 @@ contains
     ! Return if there is no more items
     if ( pstart .gt. pend ) return
 
-    dy = xo
+    dy = yo
 
-    dx = yo
-
-    prevLen = iLength(itemsOrder(pstart))
+    dx = xo
 
     i = pstart
     
+    prevLen = iLength(itemsOrder(i))
+
     do while ( i .le. pend )
 
        j = itemsOrder(i)
 
-       write(*,*) 'Inserted', j
-       
-       ! Never enter in the first iteration
-       if ( iLength(j) .ne. prevLen ) then
-
-          write(*,*) 'Smaller found. Reducing...'
-          
-          call recInitialPoint(itemsOrder, i, pend, dx, dy, &
-               width, dx + prevLen, x, howMany)
-
-          nPlaced = nPlaced + howMany
-          
-          i = i + howMany
-
-       end if
-
-       prevLen = iLength(j)
-             
        ! TODO: Think about the case when the width is small for the
-       ! first item.
-       if ( dy + iWidth(j) .gt. width ) then 
+       ! first item
+       if ( dy + iWidth(j) .gt. width ) then
 
-          ! Return if the next item does not fit in the new column.
-          if ( dx + iLength(j) .gt. length ) return
-          
+          prevLen = iLength(j)
+             
           dx = dx + iLength(j)
 
           dy = yo
 
        end if
 
+       ! Stop if the next item does not fit in the new column
+       if ( dx + iLength(j) .gt. length ) return
+       
+       ! Never enters in the first iteration or in a new column
+       if ( iLength(j) .ne. prevLen ) then
+
+          ! If the size of the item has changed (decreased), it may be
+          ! possible to pack items in the remaining space
+          call recInitialPoint(itemsOrder, i, pend, dx, dy, &
+               width, dx + prevLen, x, howMany)
+
+          ! When returning, two cases can occurr
+          ! 1. No item was placed - begin new column
+          ! 2. Some items were placed - update prevLen and
+          !    start new column
+          ! In both cases, cycle the loop
+          
+          ! Update the number of placed items
+          nPlaced = nPlaced + howMany
+          
+          i = i + howMany
+
+          dy = yo
+
+          dx = dx + prevLen
+
+          if ( i .le. pend ) prevLen = iLength(itemsOrder(i))
+
+          cycle
+
+       end if
+
+       ! Place the item
+       
+       prevLen = iLength(j)
+
        x(2 * (j - 1) + 1) = dx
        
        x(2 * j) = dy
 
+       ! Prepare for the next iteration
+       
        dy = dy + iWidth(j)
 
        i = i + 1
@@ -599,8 +628,6 @@ contains
 
     end do
 
-    write(*,*) 'Placed', nPlaced
-    
   end subroutine recInitialPoint
   
 ! ******************************************************************
@@ -631,8 +658,8 @@ contains
     real(8), intent(out) :: x(:)
 
     ! LOCAL SCALARS
-    integer :: i, j, nseed, itmp, ri
-    real(8) :: rnumber, cl, dx, dy, nextx, nexty, maxdx
+    integer :: i, nseed, itmp, ri
+    real(8) :: rnumber, dx, dy
 
     ! LOCAL ARRAYS
     integer, allocatable :: seed(:), ritems(:)
