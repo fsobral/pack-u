@@ -66,5 +66,6 @@ clean :
 	rm -f *.o *.mod *.obj *.bin
 	rm -f $(FRUIT_GEN_CODE)
 	rm -f result.xml result_tmp.xml
+	rm -f $(PACKUOUTFILES) $(PACKUINFILES) true_sol.txt
 
 .PHONY : all clean run

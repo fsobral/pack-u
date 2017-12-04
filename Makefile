@@ -26,6 +26,10 @@ BUILDDIR = $(PACKUDIR)/build
 SRCDIR = $(PACKUDIR)/src
 TESTDIR = $(PACKUDIR)/tests
 
+# Output files
+PACKUINFILES = containers.txt items.txt data.txt
+PACKUOUTFILES = packu sol[0-9][0-9][0-9].* solution.csv stats.csv
+
 export
 
 lib: libpacku.a
