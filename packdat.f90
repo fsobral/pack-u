@@ -35,6 +35,9 @@ module packdat
   ! Active items
   integer :: iini, iend
 
+  ! Output information
+  logical :: VERBOSE = .true.
+
   ! PRIVATE ARRAYS
 
   ! Falta colocar ponteiros para o tipo e o numero!
@@ -84,10 +87,27 @@ module packdat
             removeAppendedBox, appendBox, removeBoxes, sortItems, &
             reduction, printStats, remainingItems, resetPacking,  &
             saveSol, reset, cId, iId, sortContainers, &
-            getAvContainers, setMaxItems_
+            getAvContainers, setMaxItems_, &
+            setVerbose
 
 contains
 
+! ******************************************************************
+! ******************************************************************
+
+  subroutine setVerbose(verb)
+
+    ! Sets the output level.
+    
+    implicit none
+
+    ! SCALAR ARGUMENTS
+    logical, intent(in) :: verb
+
+    VERBOSE = verb
+    
+  end subroutine setVerbose
+  
 ! ******************************************************************
 ! ******************************************************************
 
@@ -151,7 +171,8 @@ contains
 
     end do
 
-    write(*,FMT=0080) nTContainers, nTItems, tbArea,  &
+    if ( VERBOSE ) &
+         write(*,FMT=0080) nTContainers, nTItems, tbArea,  &
          tiArea, (tbArea / tiArea - 1.0D0) * 100.0D0, &
          elapsedTime * 1.0D+02
 
@@ -281,7 +302,13 @@ contains
 
     if ( c .le. 0 .or. c .gt. nContainers ) then
 
-       write(*,*) 'Wrong container number'
+       if ( VERBOSE ) then
+          
+          write(*,FMT=1000) 'SETCURRCONTAINER'
+          
+1000      format('ERROR in subr. ',A10,': Wrong container number.')
+
+       end if
 
        stop
 
@@ -361,9 +388,15 @@ contains
 
        ! Draw pattern
 
-       write(*,*) 'Eliminating', max(0, qot) * maxitems(curr_item), 'items of ', &
-            'type', curr_item, 'in', max(0, qot), 'containers of type',          &
-            conttype(curr_item), '.'
+       if ( VERBOSE ) then
+       
+          write(*, FMT=1000) max(0, qot) * maxitems(curr_item), &
+               curr_item, max(0, qot), conttype(curr_item)
+
+1000      format('INFO: Eliminating ',I6,' items of type ',I3 &
+                 ' in ',I6,' containers of type ',I3,'.')
+
+       end if
 
        do i = 1, qot
 
@@ -885,7 +918,7 @@ contains
        ! TODO: make loadData return an error flag.
        if ( contType(t) .eq. -1 ) then
 
-          write(*, *) "ERROR: Item without container."
+          if ( VERBOSE ) write(*, FMT=1000) 'LOADDATA'
 
           stop
 
@@ -905,7 +938,7 @@ contains
 
        read(99, *) types(t)
 
-       write(*,*) types(t), 'elements of type', t
+       if ( VERBOSE ) write(*,FMT=1001) types(t), t
 
        nTItems = nTItems + types(t)
 
@@ -981,6 +1014,10 @@ contains
 
     deallocate(types, tL, tW, tId, tcl)
 
+1000 format('ERROR in subr. ',A10,': Item without container.')
+
+1001 format('INFO: ',I6,' elements of type ',I3,'.')
+    
   end subroutine loadData
 
 ! ******************************************************************
@@ -993,8 +1030,10 @@ contains
 
     implicit none
 
-    write(*,*) 'Removing item', iNumber(nItems)
+    if ( VERBOSE ) write(*, FMT=1000) iNumber(nItems)
 
+1000 format('INFO: Removing item ',I6,'.')
+    
     call updateCurrItems(iini, iend - 1)
 
   end subroutine removeAppendedBox
@@ -1047,13 +1086,13 @@ contains
 
     if ( hasAppended ) then
 
-       write(*,*) 'Appending item', iNumber_(item)
+       if ( VERBOSE ) write(*, FMT=1000) iNumber_(item)
+
+1000   format('INFO: Appending item ',I6,'.')
 
        call swap(x, iWidth_, iLength_, iType_, iNumber_,iId_ ,item, iend + 1)
 
        call updateCurrItems(iini, iend + 1)
-
-       !write(*,*), iNumber_(item), iNumber(nItems)
 
     end if
 
@@ -1149,7 +1188,7 @@ contains
 
     call iswap(vn, it1, it2)
 
-	call iswap(vid,it1, it2)
+    call iswap(vid,it1, it2)
 
   end subroutine swap
 
@@ -1175,15 +1214,15 @@ contains
 
     ! Select items
 
-    write(*,*) 'Selected items:'
+    if ( VERBOSE ) write(*, FMT=1000)
 
     do i = 1, nItems
 
        if ( x(2 * (i - 1) + 1) + iLength(i) .le. cLength ) then
 
-          write(*,*) 'Item', iNumber(i)
+          if ( VERBOSE ) write(*, FMT=1001) iNumber(i)
 
-          call swap(x, iLength, iWidth, iType, iNumber,iId, pos, i)
+          call swap(x, iLength, iWidth, iType, iNumber, iId, pos, i)
 
           pos = pos + 1
 
@@ -1201,9 +1240,10 @@ contains
 
        do j = i - 1, 1, -1
 
-          if ( evalover(x, i, j) .gt. min(iWidth(i), iWidth(j)) ** 2.0D0 ) then
+          if ( evalover(x, i, j) .gt. &
+               min(iWidth(i), iWidth(j)) ** 2.0D0 ) then
 
-             write(*, *) 'Detected overlapping between', iNumber(i), 'and', iNumber(j)
+             if ( VERBOSE ) write(*, FMT=1002) iNumber(i), iNumber(j)
 
              call swap(x, iLength, iWidth, iType, iNumber,iId, i, pos)
 
@@ -1221,6 +1261,12 @@ contains
 
     call updateCurrItems(iini, iini + pos - 1)
 
+1000 format('INFO: Selected items:')
+
+1001 format(6X,'Item',I6)
+
+1002 format('INFO: Detected overlapping between',I6,' and ',I6,'.')
+
   end subroutine extractBoxes
 
 ! ******************************************************************
@@ -1237,8 +1283,11 @@ contains
     ! SCALAR ARGUMENTS
     integer, intent(in) :: nit
 
-    if ( nit .gt. nItems ) write(*,*) 'WARNING: Number of removed', &
-         'items greater than total number of items!'
+    if ( nit .gt. nItems ) then
+       
+       if ( VERBOSE ) write(*, FMT=1000)
+
+    end if
 
     if ( nit .gt. 0 ) then
 
@@ -1249,6 +1298,9 @@ contains
     end if
 
     call updateCurrItems(iini + nit, nTItems)
+
+1000 format('WARNING: Number of removed items greater than ', &
+            'total number of items!')
 
   end subroutine removeItems
   
