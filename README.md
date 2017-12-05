@@ -32,14 +32,15 @@ To build Pack-U you need to
 
   1. Download Pack-U
 
-  1. Modify the path to ALGENCAN's library in the `Makefile`. The
-  default is
+  1. Create a file `user_variables.mk` and define the path to
+     ALGENCAN's library. The name of the variable is `TANGOLIB` and a
+     example is given by
 
-          TANGOLIB = /opt/tango/algencan-3.0.0/lib
+         TANGOLIB = /opt/tango/algencan-3.0.0/lib
 
   1. Type
   
-          make packu
+         make packu
 
 The generated file is located in the path given by `BUILDDIR`
 variable, which is `build/` by default.
@@ -48,7 +49,7 @@ variable, which is `build/` by default.
 
 Pack-U needs 3 files to solve a packing problem:
 
-  - `containers.txt`: the type of containers that can be used. The
+  - `containers.txt`: the types of containers that can be used. The
     first line contains the **number** of different containers. Each
     remaining line contains the **length**, **width** and **id** of
     each container. The following example illustrates the case of 2
@@ -59,7 +60,7 @@ Pack-U needs 3 files to solve a packing problem:
 		40.0 30.0 0
 		28.5 17.5 0
 
-  - `items.txt`: the type of items that can be packed. The first line
+  - `items.txt`: the types of items that can be packed. The first line
     contains the **number** of different types of items. Each
     remaining line contains a triple: **width**, **height** and
     **id**. The following example illustrates the case of 4 items with
@@ -72,7 +73,7 @@ Pack-U needs 3 files to solve a packing problem:
         7.5 7.5 0
 
   - `data.txt`: the **number items of each type** to be packed. It has
-    the same number of lines as the number of type of items in the
+    the same number of lines as the number of types of items in the
     problem. In this example, a possible data file is:
 
         300
@@ -134,7 +135,7 @@ Pack-U produces several files for output information:
     where `NC` is the *number of containers*, `NI` is the *number of
     items*, `TCA` is the *total area of the containers*, `TIA` is the
     *total area of the items*, `WR` is the *waste ratio* in percents
-    (100 * (TCA / TIA - 1)) and `CPU` is the *CPU time* in
+    `(100 * (TCA / TIA - 1))` and `CPU` is the *CPU time* in
     milliseconds.
 
 The solution obtained for the above problem is
@@ -160,11 +161,14 @@ and the images generated are
 The *id* parameter was introduced to describe which items can be
 placed in which containers. Thus, the *id*s of item types and
 containers must be related. The idea is that an item of type with *id*
-`X` can be packed into containers of *id* `Y` if and only if `Y >= X`.
+`X` can be packed into containers of *id* `Y` if and only if `Y >=
+X`. In addition, if a container of type `Y` was used to pack items,
+then it *must have* a least one item of type with id `X = Y`.
 
 > For example, items with *id* `1` can be packed into containers of
 > *id* `1` and `2`, but **cannot** be packed into container with *id*
-> `0`!
+> `0`! Conversely, if a container with *id* `2` was selected, it must
+> have at least one item of type with *id* `2`!
 
 Let's recall the [full example](#setting) above and insert some
 *id*s. In this new example, items of type 1 can only be packed into
@@ -219,7 +223,9 @@ and the images generated are
 
 We can see that the red items are not packed into the larger
 containers. On the other hand, the other items (for example, the
-purple ones) were packed into both containers.
+purple ones) were packed into both containers. We also can see that
+there is no small container (which has *id* 1) with only purple
+and blue items (which have *id* 0).
 
 ## Solver configuration
 
