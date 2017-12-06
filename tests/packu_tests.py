@@ -5,7 +5,7 @@ import re
 # Working with files and directories
 import os
 
-from packu import Item, Container, parse_items_files
+from packu import Item, Container, parse_items_files, parse_containers_files
 
 
 class IntegrationTests(unittest.TestCase):
@@ -54,13 +54,13 @@ class IntegrationTests(unittest.TestCase):
 
 class TestFileLoader(unittest.TestCase):
 
-    def create_items_files(self, item_list):
+    def create_file(self, filename, obj_list):
 
-        with open("items.txt", "w") as fp:
+        with open(filename, "w") as fp:
 
-            fp.write(str(len(item_list)) + "\n")
+            fp.write(str(len(obj_list)) + "\n")
 
-            for item in item_list:
+            for item in obj_list:
 
                 fp.write(str(item) + "\n")
 
@@ -70,13 +70,27 @@ class TestFileLoader(unittest.TestCase):
 
         item_list = [item1]
 
-        self.create_items_files(item_list)
+        self.create_file("items.txt", item_list)
 
         result_list = parse_items_files("items.txt")
 
         self.assertEqual(1, len(result_list))
 
         self.assertEqual(item_list, result_list)
+
+    def test_load_container_file(self):
+
+        cont1 = Container(5, 5, 0)
+
+        cont_list = [cont1]
+
+        self.create_file("containers.txt", cont_list)
+
+        result_list = parse_containers_files("containers.txt")
+
+        self.assertEqual(1, len(result_list))
+
+        self.assertEqual(cont_list, result_list)
 
     def test_load_file_comments(self):
 
@@ -92,7 +106,7 @@ class TestFileLoader(unittest.TestCase):
 
             fp.write(str(item) + " # Another comment")
 
-        self.create_items_files(item_list)
+        self.create_file("items.txt", item_list)
 
         result_list = parse_items_files("items.txt")
 

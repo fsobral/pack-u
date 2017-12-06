@@ -73,7 +73,7 @@ def parse_items_files(filename):
 
                 except Exception as e:
 
-                    print("The first parameter is the number of items.")
+                    print("ERROR: The first parameter is the number of items.")
 
                     break
 
@@ -84,15 +84,71 @@ def parse_items_files(filename):
                     item = Item(float(tokens[0]), float(tokens[1]),
                                 int(tokens[2]))
 
-                    print("Created item " + str(item))
+                    print("INFO: Created item " + str(item))
 
                     item_list.append(item)
 
                 except Exception as e:
 
-                    print("Item type format: length width id. Found: " +
+                    print("ERROR: Item type format: length width id. Found: " +
                           line)
 
                     break
 
         return item_list
+
+
+def parse_containers_files(filename):
+
+    """This function opens the file associated with the type of
+    containers, parses it and creates a list of containers. Returns
+    this list of containers.
+
+    """
+
+    nContTypes = 0
+
+    cont_list = []
+
+    with open(filename, "r") as fp:
+
+        for line in fp:
+
+            if line.startswith('#'):
+
+                continue
+
+            tokens = line.split()
+
+            if nContTypes <= 0:
+
+                try:
+
+                    nContTypes = int(tokens[0])
+
+                except Exception as e:
+
+                    print("ERROR: The first parameter is the number " +
+                          "of containers.")
+
+                    break
+
+            else:
+
+                try:
+
+                    cont = Container(float(tokens[0]), float(tokens[1]),
+                                     int(tokens[2]))
+
+                    print("INFO: Created container" + str(cont))
+
+                    cont_list.append(cont)
+
+                except Exception as e:
+
+                    print("ERROR: Container type format: length width id. " +
+                          "Found: " + line)
+
+                    break
+
+        return cont_list
