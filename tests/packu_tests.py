@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 
 import unittest
+import re
+# Working with files and directories
 import os
 
 from packu import Item, Container, parse_items_files
@@ -16,9 +18,13 @@ class IntegrationTests(unittest.TestCase):
 
     def test_problems(self):
 
-        for t in range(1, 15):
+        tstPattern = re.compile("^t[0-9]+$")
 
-            os.system('cp {0:s}/t{1:d}/*.txt . -v'.format(
+        test_dirs = os.listdir(self.TESTPATH)
+
+        for t in [td for td in test_dirs if tstPattern.match(td) is not None]:
+
+            os.system('cp {0:s}/{1:s}/*.txt . -v'.format(
                 self.TESTPATH, t))
 
             os.system('../build/packu')
@@ -35,13 +41,13 @@ class IntegrationTests(unittest.TestCase):
 
                         self.assertEqual(
                             len(b), len(a),
-                            msg='t{0:d}: Different files.'.format(t))
+                            msg='{0:s}: Different files.'.format(t))
 
                         for i in range(0, len(a)):
 
                             self.assertEqual(
                                 b[i].strip(), a[i].strip(),
-                                't{0:d}: Different files.'.format(t))
+                                '{0:s}: Different files.'.format(t))
 
                     self.assertEqual('', tfp.readline())
 
