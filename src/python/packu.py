@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 
 
+class PackuError(Exception):
+
+    def __init__(self):
+
+        pass
+
+
 class Item:
 
     def __init__(self, ile, iwi, iid):
@@ -152,3 +159,70 @@ def parse_containers_files(filename):
                     break
 
         return cont_list
+
+
+def calculate_maximum(itemfile, contfile):
+    """This function calculates the which available containers can pack
+       the maximum number of the same items, using a simple heuristic.
+
+    Returns a map item -> (container, number of items) or raise an
+    exception if something goes wrong.
+
+    """
+
+    items_list = parse_items_files(itemfile)
+
+    cont_list = parse_containers_files(contfile)
+
+    cont_for_items = {}
+
+    for item in items_list:
+
+        maxItems = 0
+        maxItCont = None
+
+        for cont in cont_list:
+
+            howMany = cont.how_many_items(item)
+
+            if howMany > maxItems:
+
+                maxItems = howMany
+
+                maxItCont = cont
+
+        if maxItems is 0:
+
+            print("ERROR: Item does not fit in any container.")
+
+            raise PackuError()
+
+        cont_for_items[item] = (maxItCont, maxItems)
+
+    return cont_for_items
+
+
+def reduce(datafile, items_list, itcont_map):
+
+    with open(datafile, "r") as fp:
+
+        for it in items_list:
+
+            try:
+
+                nit = int(fp.readline())
+
+            except Exception:
+
+                print("ERROR: Inconsistent data file {0:s}.".
+                      format(datafile))
+
+                raise PackuError()
+
+            maxcont, maxit = itcont_map[it]
+
+            (ncont, remit) = divmod(nit, maxit)
+
+            print("Packed {0:d} items of type {1:d} in {2:d} " +
+                  "containers of type {3:d}".
+                  format(ncont * maxit, -1, ncont, -1))
