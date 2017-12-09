@@ -10,13 +10,21 @@ class PackuError(Exception):
 
 class Item:
 
-    def __init__(self, ile, iwi, iid):
+    UIDFMT = '{0:03d}'
+
+    def __init__(self, ile, iwi, iid, uid=0):
 
         self.length_ = ile
 
         self.width_ = iwi
 
         self.id_ = iid
+
+        self.uid_ = uid
+
+    def getUid(self):
+
+        return self.uid_
 
     def __str__(self):
 
@@ -31,16 +39,20 @@ class Item:
 
         return False
 
+    def __hash__(self):
+
+        return self.getUid()
+
 
 class Container(Item):
 
-    def __init__(self, cle, cwi, cid):
+    def __init__(self, cle, cwi, cid, uid=0):
 
-        super().__init__(cle, cwi, cid)
+        super().__init__(cle, cwi, cid, uid=uid)
 
     def how_many_items(self, item):
 
-        if item.id_ <= self.id_:
+        if item.id_ == self.id_:
 
             nL = self.length_ / item.length_
 
@@ -53,7 +65,9 @@ class Container(Item):
 
 def parse_items_files(filename):
 
-    """This function opens the file associated with the type of items,
+    """
+
+    This function opens the file associated with the type of items,
     parses it and creates a list of items. Returns this list of items.
 
     """
@@ -61,6 +75,8 @@ def parse_items_files(filename):
     nItemsTypes = 0
 
     item_list = []
+
+    itemUid = 0
 
     with open(filename, "r") as fp:
 
@@ -87,9 +103,10 @@ def parse_items_files(filename):
             else:
 
                 try:
+                    itemUid += 1
 
                     item = Item(float(tokens[0]), float(tokens[1]),
-                                int(tokens[2]))
+                                int(tokens[2]), uid=itemUid)
 
                     print("INFO: Created item " + str(item))
 
@@ -107,7 +124,9 @@ def parse_items_files(filename):
 
 def parse_containers_files(filename):
 
-    """This function opens the file associated with the type of
+    """
+
+    This function opens the file associated with the type of
     containers, parses it and creates a list of containers. Returns
     this list of containers.
 
@@ -116,6 +135,8 @@ def parse_containers_files(filename):
     nContTypes = 0
 
     cont_list = []
+
+    contUid = 0
 
     with open(filename, "r") as fp:
 
@@ -143,9 +164,10 @@ def parse_containers_files(filename):
             else:
 
                 try:
+                    contUid += 1
 
                     cont = Container(float(tokens[0]), float(tokens[1]),
-                                     int(tokens[2]))
+                                     int(tokens[2]), uid=contUid)
 
                     print("INFO: Created container" + str(cont))
 
@@ -161,18 +183,63 @@ def parse_containers_files(filename):
         return cont_list
 
 
-def calculate_maximum(itemfile, contfile):
-    """This function calculates the which available containers can pack
-       the maximum number of the same items, using a simple heuristic.
+def load_items_to_place(datafile, numberOfItems):
+
+    """
+
+    This function returns a list with the quantity of each type of item
+    to be packed. Raise an PackuError if an inconsistent file was found.
+
+    """
+
+    with open(datafile, "r") as fp:
+
+        items_to_place = []
+
+        for line in fp:
+
+            try:
+
+                nit = int(line)
+
+            except Exception:
+
+                print("ERROR: Inconsistent data file {0:s}.".
+                      format(datafile))
+
+                raise PackuError()
+
+            else:
+
+                if nit < 0:
+
+                    print("ERROR: Inconsistent data file {0:s}.".
+                          format(datafile))
+
+                    raise PackuError()
+
+            items_to_place.append(nit)
+
+    if len(items_to_place) != numberOfItems:
+
+        print("ERROR: Wrong number of item types in file {0:s}.".
+              format(datafile))
+
+        raise PackuError()
+
+    return items_to_place
+
+
+def calculate_maximum(items_list, cont_list):
+    """
+
+    This function calculates which available containers can pack
+    the maximum number of the same items, using a simple heuristic.
 
     Returns a map item -> (container, number of items) or raise an
     exception if something goes wrong.
 
     """
-
-    items_list = parse_items_files(itemfile)
-
-    cont_list = parse_containers_files(contfile)
 
     cont_for_items = {}
 
@@ -193,7 +260,8 @@ def calculate_maximum(itemfile, contfile):
 
         if maxItems is 0:
 
-            print("ERROR: Item does not fit in any container.")
+            print("ERROR: Item {0:d} does not fit in any container.".
+                  format(item.getUid()))
 
             raise PackuError()
 
@@ -202,27 +270,32 @@ def calculate_maximum(itemfile, contfile):
     return cont_for_items
 
 
-def reduce(datafile, items_list, itcont_map):
+def reduce(items_list, itcont_map, items_to_place):
 
-    with open(datafile, "r") as fp:
+    remaining = []
 
-        for it in items_list:
+    for i in range(0, len(items_list)):
 
-            try:
+        it = items_list[i]
 
-                nit = int(fp.readline())
+        nit = items_to_place[i]
 
-            except Exception:
+        maxcont, maxit = itcont_map[it]
 
-                print("ERROR: Inconsistent data file {0:s}.".
-                      format(datafile))
+        (ncont, remit) = divmod(nit, maxit)
 
-                raise PackuError()
+        remaining.append(remit)
 
-            maxcont, maxit = itcont_map[it]
+        print("Packed {0:d} items of type {1:d} in {2:d} " +
+              "containers of type {3:d}".
+              format(ncont * maxit, it.getUid(), ncont,
+                     maxcont.getUid()))
 
-            (ncont, remit) = divmod(nit, maxit)
+    return remaining
 
-            print("Packed {0:d} items of type {1:d} in {2:d} " +
-                  "containers of type {3:d}".
-                  format(ncont * maxit, -1, ncont, -1))
+
+# Run
+
+if __name__ == "__main__":
+
+    pass

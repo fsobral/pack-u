@@ -5,7 +5,8 @@ import re
 # Working with files and directories
 import os
 
-from packu import Item, Container, parse_items_files, parse_containers_files
+from packu import Item, Container, parse_items_files, parse_containers_files, \
+    calculate_maximum, load_items_to_place, PackuError, reduce
 
 
 class IntegrationTests(unittest.TestCase):
@@ -52,6 +53,52 @@ class IntegrationTests(unittest.TestCase):
                     self.assertEqual('', tfp.readline())
 
 
+class TestReducer(unittest.TestCase):
+
+    def test_calculate_max_items(self):
+
+        items_list = [Item(1, 1, 0),
+                      Item(2, 2, 2)]
+
+        cont_list = [Container(10, 10, 0),
+                     Container(40, 40, 2)]
+
+        itmap = calculate_maximum(items_list, cont_list)
+
+        (mc, mi) = itmap[items_list[0]]
+
+        self.assertEqual(cont_list[0], mc)
+
+        self.assertEqual(100, mi)
+
+        (mc, mi) = itmap[items_list[1]]
+
+        self.assertEqual(cont_list[1], mc)
+
+        self.assertEqual(400, mi)
+
+    def test_reduce(self):
+
+        items_list = [Item(1, 1, 0, 1),
+                      Item(2, 2, 2, 2)]
+
+        itmap = dict()
+
+        itmap[items_list[0]] = (Container(10, 10, 0), 100)
+
+        itmap[items_list[1]] = (Container(40, 40, 2), 400)
+
+        items_data = [100, 810]
+
+        remaining = reduce(items_list, itmap, items_data)
+
+        self.assertEquals(len(items_data), len(remaining))
+
+        self.assertEquals(0, remaining[0])
+
+        self.assertEquals(10, remaining[1])
+
+
 class TestFileLoader(unittest.TestCase):
 
     def create_file(self, filename, obj_list):
@@ -64,9 +111,79 @@ class TestFileLoader(unittest.TestCase):
 
                 fp.write(str(item) + "\n")
 
+    def test_load_datafile(self):
+
+        it_list = [10, 0, 0, 20]
+
+        with open("data.txt", "w") as fp:
+
+            for it in it_list:
+
+                fp.write(str(it) + "\n")
+
+        ret_list = load_items_to_place("data.txt", len(it_list))
+
+        self.assertEqual(it_list, ret_list)
+
+    def test_load_datafile_wrong_number(self):
+
+        it_list = [10, 0, 0, 20]
+
+        with open("data.txt", "w") as fp:
+
+            for it in it_list:
+
+                fp.write(str(it) + "\n")
+
+        with self.assertRaises(PackuError):
+
+            load_items_to_place("data.txt", 3)
+
+        self.assertEqual(it_list, load_items_to_place("data.txt", 4))
+
+    def test_load_datafile_wrong_value(self):
+
+        it_list = [10, 0, 0, -1]
+
+        with open("data.txt", "w") as fp:
+
+            for it in it_list:
+
+                fp.write(str(it) + "\n")
+
+        with self.assertRaises(PackuError):
+
+            load_items_to_place("data.txt", len(it_list))
+
+    def test_load_item_uid(self):
+
+        item_list = [Item(2, 3, 1, 1),
+                     Item(2, 3, 1, 2)]
+
+        self.create_file("items.txt", item_list)
+
+        result_list = parse_items_files("items.txt")
+
+        self.assertEqual(2, len(result_list))
+
+        self.assertEqual(item_list, result_list)
+
+    def test_load_container_uid(self):
+
+        cont_list = [Container(2, 3, 1, 1),
+                     Container(2, 3, 0, 2)]
+
+        self.create_file("containers.txt", cont_list)
+
+        result_list = parse_containers_files("containers.txt")
+
+        self.assertEqual(2, len(result_list))
+
+        self.assertEqual(cont_list, result_list)
+
     def test_load_item_file(self):
 
-        item1 = Item(2, 3, 1)
+        item1 = Item(2, 3, 1, 1)
 
         item_list = [item1]
 
@@ -80,7 +197,7 @@ class TestFileLoader(unittest.TestCase):
 
     def test_load_container_file(self):
 
-        cont1 = Container(5, 5, 0)
+        cont1 = Container(5, 5, 0, 1)
 
         cont_list = [cont1]
 
@@ -94,7 +211,7 @@ class TestFileLoader(unittest.TestCase):
 
     def test_load_file_comments(self):
 
-        item = Item(5, 5, 0)
+        item = Item(5, 5, 0, 1)
 
         item_list = [item]
 
@@ -159,7 +276,7 @@ class TestContainer(unittest.TestCase):
 
         self.assertEqual(16, container1.how_many_items(item1))
 
-        self.assertEqual(9, container2.how_many_items(item1))
+        self.assertEqual(0, container2.how_many_items(item1))
 
         self.assertEqual(0, container1.how_many_items(item2))
 
