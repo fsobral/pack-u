@@ -286,7 +286,7 @@ def reduce(items_list, itcont_map, items_to_place):
 
         remaining.append(remit)
 
-        print("Packed {0:d} items of type {1:d} in {2:d} " +
+        print("INFO: Packed {0:d} items of type {1:d} in {2:d} " +
               "containers of type {3:d}".
               format(ncont * maxit, it.getUid(), ncont,
                      maxcont.getUid()))
@@ -298,4 +298,20 @@ def reduce(items_list, itcont_map, items_to_place):
 
 if __name__ == "__main__":
 
-    pass
+    ITEMS = 'items.txt'
+
+    CONTAINERS = 'containers.txt'
+
+    DATA = 'data.txt'
+
+    # Load data
+
+    items_list = parse_items_files(ITEMS)
+
+    containers_list = parse_containers_files(CONTAINERS)
+
+    items_to_place = load_items_to_place(DATA, len(items_list))
+
+    itmap = calculate_maximum(items_list, containers_list)
+
+    remaining_items = reduce(items_to_place, itmap, items_to_place)
