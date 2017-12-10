@@ -7,7 +7,7 @@ It uses the Apache CouchDB database and Python.
 
 """
 
-import couchdb
+import pycouchdb as couchdb
 
 DBNAME = 'packu_cache'
 
@@ -33,7 +33,8 @@ def createKey(problemData):
 
     """
 
-    Creates the key for a given 'problemData'.
+    Creates the key for a given 'problemData' list of number
+    of item types.
 
     """
 
