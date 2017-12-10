@@ -281,12 +281,16 @@ def reduce(items_list, itcont_map, items_to_place, remainingLevel=0):
     'remainingLevel' is the level of remaining items left. 0 means
     maximum packing.
 
-    Returns a list with the number of remaining items of each type to
-    be packed after using the heuristic.
+    Returns two lists:
+    - a list with the number of containers used to reduce each type of item
+    - a list with the number of remaining items of each type to be packed
+      after using the heuristic.
 
     """
 
     remaining = []
+
+    allocated = []
 
     for i in range(0, len(items_list)):
 
@@ -306,12 +310,15 @@ def reduce(items_list, itcont_map, items_to_place, remainingLevel=0):
         # Save remaining items to be packed
         remaining.append(remit)
 
+        # Save allocated items and container
+        allocated.append(ncont)
+
         print("INFO: Packed {0:d} items of type {1:d} in {2:d} " +
               "containers of type {3:d}".
               format(ncont * maxit, it.getUid(), ncont,
                      maxcont.getUid()))
 
-    return remaining
+    return allocated, remaining
 
 
 def save_remaining_items(datafile, remaining_list):

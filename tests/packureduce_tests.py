@@ -83,21 +83,28 @@ class TestReducer(unittest.TestCase):
         items_list = [Item(1, 1, 0, 1),
                       Item(2, 2, 2, 2)]
 
+        containers = [Container(10, 10, 0),
+                      Container(40, 40, 2)]
+
         itmap = dict()
 
-        itmap[items_list[0]] = (Container(10, 10, 0), 100)
+        itmap[items_list[0]] = (containers[0], 100)
 
-        itmap[items_list[1]] = (Container(40, 40, 2), 400)
+        itmap[items_list[1]] = (containers[1], 400)
 
         items_data = [100, 810]
 
-        remaining = reduce(items_list, itmap, items_data)
+        allocated, remaining = reduce(items_list, itmap, items_data)
 
         self.assertEqual(len(items_data), len(remaining))
 
         self.assertEqual(0, remaining[0])
 
+        self.assertEqual(1, allocated[0])
+
         self.assertEqual(10, remaining[1])
+
+        self.assertEqual(2, allocated[1])
 
 
 class TestFileLoader(unittest.TestCase):
