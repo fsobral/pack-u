@@ -4,9 +4,10 @@ import unittest
 import re
 # Working with files and directories
 import os
-
-from packu import Item, Container, parse_items_files, parse_containers_files, \
-    calculate_maximum, load_items_to_place, PackuError, reduce
+# Packu package
+from packu.packureduce import Item, Container, parse_items_files, \
+    parse_containers_files, calculate_maximum, load_items_to_place, \
+    PackuError, reduce
 
 
 class IntegrationTests(unittest.TestCase):
