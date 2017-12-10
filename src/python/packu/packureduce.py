@@ -313,10 +313,11 @@ def reduce(items_list, itcont_map, items_to_place, remainingLevel=0):
         # Save allocated items and container
         allocated.append(ncont)
 
-        print("INFO: Packed {0:d} items of type {1:d} in {2:d} " +
-              "containers of type {3:d}".
-              format(ncont * maxit, it.getUid(), ncont,
-                     maxcont.getUid()))
+        strFormat = "INFO: Packed {0:d} items of type {1:d} in {2:d} " + \
+                    "containers of type {3:d}"
+
+        print(strFormat.format(ncont * maxit, it.getUid(), ncont,
+                               maxcont.getUid()))
 
     return allocated, remaining
 

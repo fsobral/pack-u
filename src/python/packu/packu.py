@@ -58,13 +58,13 @@ if __name__ == "__main__":
     # Second cache: check if the reduced problem has already been
     # solved
 
-    key = pc.createKey(remaining_items)
+    redkey = pc.createKey(remaining_items)
 
-    sol = pc.getSolution(key)
+    sol = pc.getSolution(redkey)
 
     if sol is not None:
 
-        print('INFO: Solution partially retrieved from cache.')
+        print('INFO: Solution partially retrieved from cache.' + redkey)
 
         pc.updateSol(sol, number_containers, items_list, itmap)
 
