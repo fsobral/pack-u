@@ -68,6 +68,7 @@ containers.mod: containers.f90 items.mod
 
 clean:
 	rm -f *.mod *.o *.a solution.csv solution.pdf \
-	sol[0-9][0-9][0-9].* build/*
+	sol[0-9][0-9][0-9].*
+	rm -fr build/*
 	$(MAKE) -C $(TESTDIR) clean
 	$(MAKE) -C $(SRCDIR) clean
