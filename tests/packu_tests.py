@@ -92,11 +92,11 @@ class TestReducer(unittest.TestCase):
 
         remaining = reduce(items_list, itmap, items_data)
 
-        self.assertEquals(len(items_data), len(remaining))
+        self.assertEqual(len(items_data), len(remaining))
 
-        self.assertEquals(0, remaining[0])
+        self.assertEqual(0, remaining[0])
 
-        self.assertEquals(10, remaining[1])
+        self.assertEqual(10, remaining[1])
 
 
 class TestFileLoader(unittest.TestCase):
