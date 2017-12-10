@@ -52,7 +52,8 @@ if __name__ == "__main__":
 
     itmap = pr.calculate_maximum(items_list, containers_list)
 
-    remaining_items = pr.reduce(items_to_place, itmap, items_to_place)
+    number_containers, remaining_items = \
+        pr.reduce(items_to_place, itmap, items_to_place)
 
     # Second cache: check if the reduced problem has already been
     # solved
@@ -64,6 +65,10 @@ if __name__ == "__main__":
     if sol is not None:
 
         print('INFO: Solution partially retrieved from cache.')
+
+        # TODO: save new solution to DB
+
+        pc.updateSol(sol, number_containers, items_list, itmap)
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 

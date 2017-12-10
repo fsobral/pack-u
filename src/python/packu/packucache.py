@@ -77,6 +77,55 @@ def getSolution(key):
         return None
 
 
+def formatList(container, items_to_place):
+
+    """
+
+    Receives a container and a list with the number of items to
+    be placed on it. Returns a string representing one line of
+    the solution file.
+
+    """
+
+    s = '{0:3d},'.format(container.getUid())
+
+    for nit in items_to_place:
+
+        s += '{0:5d},'.format(nit)
+
+    return s
+
+
+def updateSol(sol, number_containers, items_list, itcont_map):
+
+    """
+
+    This function updates the solution 'sol' retrived by the database.
+    This solution is a dictionary, and the field used is sol['solution']
+    and is given by a list of strings representing the lines of the solution
+    file.
+
+    """
+
+    numberOfItems = len(items_list)
+
+    items_to_place = [0 for i in range(0, numberOfItems)]
+
+    for i in range(0, numberOfItems):
+
+        container, nit = itcont_map[items_list[i]]
+
+        items_to_place[i] = nit
+
+        formattedList = formatList(container, items_to_place)
+
+        for j in range(0, number_containers[i]):
+
+            sol['solution'].append(formattedList)
+
+        items_to_place[i] = 0
+
+
 def toFile(sol, solfilename, statsfilename):
 
     with open(solfilename, 'w') as fp:
