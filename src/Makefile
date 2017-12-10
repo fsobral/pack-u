@@ -1,5 +1,5 @@
 
 clean : 
-	rm -fr python/*.pyc python/__pycache__
+	rm -fr python/packu/*.pyc python/packu/__pycache__
 
 .PHONY : clean
