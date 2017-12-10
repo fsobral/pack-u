@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     SOLFILE = 'solution.csv'
 
-    STATSFILE = 'stats.txt'
+    STATSFILE = 'stats.csv'
 
     # Load data
 
@@ -46,14 +46,14 @@ if __name__ == "__main__":
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
-        exit
+        exit()
 
     # Reduce the problem
 
     itmap = pr.calculate_maximum(items_list, containers_list)
 
     number_containers, remaining_items = \
-        pr.reduce(items_to_place, itmap, items_to_place)
+        pr.reduce(items_list, itmap, items_to_place)
 
     # Second cache: check if the reduced problem has already been
     # solved
@@ -74,22 +74,28 @@ if __name__ == "__main__":
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
-        exit
+        exit()
 
     # Save original data and create reduced problem
 
     try:
 
-        os.remove(DATATMP)
-
         os.rename(DATA, DATATMP)
 
     except OSError as io:
 
-        print('ERROR: Problems saving original data. ' +
-              'Possible loss of the file.')
+        try:
 
-        exit
+            os.remove(DATATMP)
+
+            os.rename(DATA, DATATMP)
+
+        except OSError:
+
+            print('ERROR: Problems saving original data. ' +
+                  'Possible loss of the file.')
+
+            exit()
 
     pr.save_remaining_items(DATA, remaining_items)
 
@@ -108,9 +114,9 @@ if __name__ == "__main__":
 
         os.rename(DATATMP, DATA)
 
-        exit
+        exit()
 
-    sol = pc.fromFile(SOLFILE, STATSFILE)
+    sol = pc.fromFile(key, SOLFILE, STATSFILE)
 
     if pc.saveSolution(key, sol):
 

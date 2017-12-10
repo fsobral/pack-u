@@ -27,13 +27,13 @@ class TestCache(unittest.TestCase):
 
                 fp.write(line)
 
-        with open("stats.txt", "w") as fp:
+        with open("stats.csv", "w") as fp:
 
             fp.write(sol['stats'])
 
         retrievedSol = fromFile(sol['_id'],
                                 'solution.csv',
-                                'stats.txt')
+                                'stats.csv')
 
         self.assertEqual(sol, retrievedSol)
 

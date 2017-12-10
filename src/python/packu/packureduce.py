@@ -54,11 +54,11 @@ class Container(Item):
 
         if item.id_ == self.id_:
 
-            nL = self.length_ / item.length_
+            nL = self.length_ // item.length_
 
-            nW = self.width_ / item.width_
+            nW = self.width_ // item.width_
 
-            return nL * nW
+            return int(nL * nW)
 
         return 0
 
@@ -169,7 +169,7 @@ def parse_containers_files(filename):
                     cont = Container(float(tokens[0]), float(tokens[1]),
                                      int(tokens[2]), uid=contUid)
 
-                    print("INFO: Created container" + str(cont))
+                    print("INFO: Created container " + str(cont))
 
                     cont_list.append(cont)
 
@@ -333,4 +333,4 @@ def save_remaining_items(datafile, remaining_list):
 
         for nit in remaining_list:
 
-            fp.write(str(nit) + '\n')
+            fp.write('{0:d}\n'.format(nit))

@@ -7,7 +7,7 @@ It uses the Apache CouchDB database and Python.
 
 """
 
-import pycouchdb as couchdb
+import couchdb
 
 DBNAME = 'packu_cache'
 
