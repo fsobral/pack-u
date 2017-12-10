@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     SOLFILE = 'solution.csv'
 
-    STATSFILE = 'stats.csv'
+    STATSFILE = 'stats.txt'
 
     # Load data
 
@@ -66,9 +66,11 @@ if __name__ == "__main__":
 
         print('INFO: Solution partially retrieved from cache.')
 
-        # TODO: save new solution to DB
-
         pc.updateSol(sol, number_containers, items_list, itmap)
+
+        sol['_id'] = key
+
+        pc.saveSolution(key, sol)
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
@@ -91,36 +93,31 @@ if __name__ == "__main__":
 
     pr.save_remaining_items(DATA, remaining_items)
 
-    # Cache
+    # Call Fortran
+    # TODO: if it takes too long, apply recursive heuristic.
 
-    key = pc.createKey(items_to_place)
+    print('INFO: Solution not found in cache. Will run Pack-U.')
 
-    sol = pc.getSolution(key)
+    try:
 
-    if sol is None:
+        subprocess.run(['./packu'], stdout=subprocess.PIPE)
 
-        print('Solution not found in cache. Will run Pack-U.')
+    except KeyboardInterrupt:
 
-        # Call Fortran, if necessary
+        os.remove(DATA)
 
-        try:
+        os.rename(DATATMP, DATA)
 
-            subprocess.run(['./packu'], stdout=subprocess.PIPE)
+        exit
 
-        except KeyboardInterrupt:
+    sol = pc.fromFile(SOLFILE, STATSFILE)
 
-            os.remove(DATA)
+    if pc.saveSolution(key, sol):
 
-            os.rename(DATATMP, DATA)
-
-            exit
-
-        if pc.saveSolution(key, 'solution.csv', 'stats.csv'):
-
-            print('New solution saved to cache.')
+        print('INFO: New solution saved to cache.')
 
     else:
 
-        print('Solution retrieved from cache.')
+        print('INFO: Solution retrieved from cache.')
 
-        pc.toFile(sol, 'solution.csv', 'stats.csv')
+        pc.toFile(sol, SOLFILE, STATSFILE)

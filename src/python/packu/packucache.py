@@ -93,6 +93,8 @@ def formatList(container, items_to_place):
 
         s += '{0:5d},'.format(nit)
 
+    s += '\n'
+
     return s
 
 
@@ -139,7 +141,37 @@ def toFile(sol, solfilename, statsfilename):
         fp.write(sol['stats'].rstrip() + ' *\n')
 
 
-def saveSolution(key, solfilename, statsfilename):
+def fromFile(key, solfilename, statsfilename):
+
+    """
+
+    Extracts a solution from output files generated
+    by the Fortran program.
+
+    """
+
+    s = []
+
+    with open(solfilename, 'r') as fp:
+
+        for line in fp:
+
+            s.append(line)
+
+    stats = ''
+
+    with open(statsfilename, 'r') as fp:
+
+        stats = fp.readline()
+
+    sol = {'_id': key,
+           'solution': s,
+           'stats': stats}
+
+    return sol
+
+
+def saveSolution(key, sol):
 
     if key is None:
 
@@ -149,23 +181,9 @@ def saveSolution(key, solfilename, statsfilename):
 
     if key not in db:
 
-        s = []
+        print('INFO: Added key ' + key)
 
-        with open(solfilename, 'r') as fp:
-
-            for line in fp:
-
-                s.append(line)
-
-        stats = ''
-
-        with open(statsfilename, 'r') as fp:
-
-            stats = fp.readline()
-
-        # print('Added key ' + key)
-
-        db.save({'_id': key, 'solution': s, 'stats': stats})
+        db.save(sol)
 
         return True
 
