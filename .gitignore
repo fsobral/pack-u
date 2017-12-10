@@ -7,7 +7,7 @@
 sol*.asy
 sol*.csv
 sol*.pdf
-__*
+__pycache__
 
 build/*
 tests/fruit*gen.f90
