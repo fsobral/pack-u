@@ -26,6 +26,10 @@ class Item:
 
         return self.uid_
 
+    def getArea(self):
+
+        return self.width_ * self.length_
+
     def __str__(self):
 
         return "{0:5.2f} {1:5.2f} {2:3d}".format(

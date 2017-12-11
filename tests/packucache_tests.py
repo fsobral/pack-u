@@ -4,7 +4,7 @@ import unittest
 # Packu package
 import packu.packureduce as pr
 from packu.packucache import createKey, updateSol, \
-    formatList, fromFile
+    formatList, fromFile, STATSFMT
 
 
 class TestCache(unittest.TestCase):
@@ -49,6 +49,8 @@ class TestCache(unittest.TestCase):
         sol = {}
 
         sol['solution'] = []
+
+        sol['stats'] = STATSFMT.format(0, 0, 0.0, 0.0, 0.0, 0.0)
 
         items = [pr.Item(1, 1, 0, 1),
                  pr.Item(3, 3, 0, 2)]

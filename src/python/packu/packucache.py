@@ -11,6 +11,9 @@ import couchdb
 
 DBNAME = 'packu_cache'
 
+# This format should follow the same Fortran format
+STATSFMT = '{0:7d},{1:7d},{2:10.2f},{3:10.2f},{4:20.4f},{5:20.6f}'
+
 
 def getOrCreateDB(dbname):
 
@@ -103,11 +106,19 @@ def updateSol(sol, number_containers, items_list, itcont_map):
     """
 
     This function updates the solution 'sol' retrived by the database.
-    This solution is a dictionary, and the field used is sol['solution']
-    and is given by a list of strings representing the lines of the solution
-    file.
+    This solution is a dictionary, and the field used are sol['solution'],
+    given by a list of strings representing the lines of the solution
+    file, and sol['stats'].
 
     """
+
+    totItArea = 0.0
+
+    totCoArea = 0.0
+
+    nTotIt = 0
+
+    nTotCo = 0
 
     numberOfItems = len(items_list)
 
@@ -115,17 +126,56 @@ def updateSol(sol, number_containers, items_list, itcont_map):
 
     for i in range(0, numberOfItems):
 
-        container, nit = itcont_map[items_list[i]]
+        item = items_list[i]
+
+        container, nit = itcont_map[item]
 
         items_to_place[i] = nit
 
         formattedList = formatList(container, items_to_place)
 
-        for j in range(0, number_containers[i]):
+        nc = number_containers[i]
+
+        for j in range(0, nc):
 
             sol['solution'].append(formattedList)
 
         items_to_place[i] = 0
+
+        # Update stats information
+
+        totItArea += nc * nit * item.getArea()
+
+        totCoArea += nc * container.getArea()
+
+        nTotIt += nit * nc
+
+        nTotCo += nc
+
+    # Update stats
+
+    if 'stats' in sol:
+
+        stoken = sol['stats'].split(',')
+
+        nTotCo += int(stoken[0])
+
+        nTotIt += int(stoken[1])
+
+        totCoArea += float(stoken[2])
+
+        totItArea += float(stoken[3])
+
+        time = float(stoken[5])
+
+        sol['stats'] = STATSFMT.format(
+            nTotCo, nTotIt, totCoArea, totItArea,
+            ((totCoArea / totItArea) - 1.0) * 100.0, time
+        )
+
+    else:
+
+        print("WARNING: No 'stats' in sol!")
 
 
 def toFile(sol, solfilename, statsfilename):

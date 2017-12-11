@@ -272,6 +272,14 @@ class TestContainer(unittest.TestCase):
 
         self.assertNotEqual(container1, container2)
 
+    def test_number_of_items_is_int(self):
+
+        item = Item(1.5, 1.5, 0)
+
+        container = Container(10.0, 10.0, 0)
+
+        self.assertEqual(int, type(container.how_many_items(item)))
+
     def test_number_of_items(self):
 
         item1 = Item(2, 2, 0)

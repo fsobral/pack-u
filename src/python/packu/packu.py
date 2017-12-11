@@ -125,14 +125,34 @@ if __name__ == "__main__":
 
         exit()
 
-    sol = pc.fromFile(key, SOLFILE, STATSFILE)
+    # At this moment, the solution is the reduced one
 
-    if pc.saveSolution(key, sol):
+    sol = pc.fromFile(redkey, SOLFILE, STATSFILE)
+
+    pc.saveSolution(redkey, sol)
+
+    logger.debug('New solution saved to cache. Key: ' + redkey)
+
+    # If the problem was really reduced, the store the true problem in cache
+
+    if key is not redkey:
+
+        pc.updateSol(sol, number_containers, items_list, itmap)
+
+        sol['_id'] = key
+
+        pc.saveSolution(key, sol)
 
         logger.debug('New solution saved to cache. Key: ' + key)
 
-    else:
+    pc.toFile(sol, SOLFILE, STATSFILE)
 
-        logger.debug('Solution retrieved from cache.')
+    # if pc.saveSolution(key, sol):
 
-        pc.toFile(sol, SOLFILE, STATSFILE)
+    #     logger.debug('New solution saved to cache. Key: ' + key)
+
+    # else:
+
+    #     logger.debug('Solution retrieved from cache.')
+
+    #     pc.toFile(sol, SOLFILE, STATSFILE)
