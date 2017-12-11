@@ -5,25 +5,34 @@ import packureduce as pr
 import packucache as pc
 import os
 import subprocess
+import logging
 
+
+# Parameters
+
+ITEMS = 'items.txt'
+
+CONTAINERS = 'containers.txt'
+
+DATA = 'data.txt'
+
+DATATMP = 'data.txt.tmp'
+
+SOLFILE = 'solution.csv'
+
+STATSFILE = 'stats.csv'
 
 # Run Packu
 
 if __name__ == "__main__":
 
-    # Parameters
+    # Set up logging
 
-    ITEMS = 'items.txt'
+    logger = logging.getLogger('packu')
 
-    CONTAINERS = 'containers.txt'
+    logger.addHandler(logging.StreamHandler())
 
-    DATA = 'data.txt'
-
-    DATATMP = 'data.txt.tmp'
-
-    SOLFILE = 'solution.csv'
-
-    STATSFILE = 'stats.csv'
+    logger.setLevel(logging.DEBUG)
 
     # Load data
 
@@ -42,7 +51,7 @@ if __name__ == "__main__":
 
     if sol is not None:
 
-        print('INFO: Solution retrieved from cache.')
+        logger.debug('Solution retrieved from cache. Key: ' + key)
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
@@ -64,7 +73,7 @@ if __name__ == "__main__":
 
     if sol is not None:
 
-        print('INFO: Solution partially retrieved from cache.' + redkey)
+        logger.debug('Solution partially retrieved from cache. Key: ' + redkey)
 
         pc.updateSol(sol, number_containers, items_list, itmap)
 
@@ -92,8 +101,8 @@ if __name__ == "__main__":
 
         except OSError:
 
-            print('ERROR: Problems saving original data. ' +
-                  'Possible loss of the file.')
+            logger.error('Problems saving original data. ' +
+                         'Possible loss of the file.')
 
             exit()
 
@@ -102,7 +111,7 @@ if __name__ == "__main__":
     # Call Fortran
     # TODO: if it takes too long, apply recursive heuristic.
 
-    print('INFO: Solution not found in cache. Will run Pack-U.')
+    logger.debug('Solution not found in cache. Will run Pack-U.')
 
     try:
 
@@ -120,10 +129,10 @@ if __name__ == "__main__":
 
     if pc.saveSolution(key, sol):
 
-        print('INFO: New solution saved to cache.')
+        logger.debug('New solution saved to cache. Key: ' + key)
 
     else:
 
-        print('INFO: Solution retrieved from cache.')
+        logger.debug('Solution retrieved from cache.')
 
         pc.toFile(sol, SOLFILE, STATSFILE)
