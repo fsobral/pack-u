@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+import logging
+
+
+logger = logging.getLogger('packu')
+
 
 class PackuError(Exception):
 
@@ -270,6 +275,9 @@ def calculate_maximum(items_list, cont_list):
             raise PackuError()
 
         cont_for_items[item] = (maxItCont, maxItems)
+
+        logger.debug('{0:5d} items of type {1:3d} fit in container {2:3d}'.
+                     format(maxItems, item.getUid(), maxItCont.getUid()))
 
     return cont_for_items
 
