@@ -30,7 +30,11 @@ if __name__ == "__main__":
 
     logger = logging.getLogger('packu')
 
-    logger.addHandler(logging.StreamHandler())
+    handler = logging.StreamHandler()
+
+    handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+
+    logger.addHandler(handler)
 
     logger.setLevel(logging.DEBUG)
 
@@ -51,11 +55,13 @@ if __name__ == "__main__":
 
     if sol is not None:
 
-        logger.debug('Solution retrieved from cache. Key: ' + key)
+        logger.debug('Solution retrieved from cache. Key: %s', key)
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
         exit()
+
+    logger.debug('Key {0:s} not found in cache.'.format(key))
 
     # Reduce the problem
 
@@ -73,7 +79,8 @@ if __name__ == "__main__":
 
     if sol is not None:
 
-        logger.debug('Solution partially retrieved from cache. Key: ' + redkey)
+        logger.debug('Solution partially retrieved from ' +
+                     'cache. Key: %s', redkey)
 
         pc.updateSol(sol, number_containers, items_list, itmap)
 
@@ -125,17 +132,25 @@ if __name__ == "__main__":
 
         exit()
 
+    # Restore files
+    # TODO: catch exceptions
+
+    os.remove(DATA)
+
+    os.rename(DATATMP, DATA)
+
     # At this moment, the solution is the reduced one
 
     sol = pc.fromFile(redkey, SOLFILE, STATSFILE)
 
     pc.saveSolution(redkey, sol)
 
-    logger.debug('New solution saved to cache. Key: ' + redkey)
+    logger.debug('New solution saved to cache. Key: %s', redkey)
 
-    # If the problem was really reduced, the store the true problem in cache
+    # If the problem was really reduced, then also store the true
+    # problem in cache
 
-    if key is not redkey:
+    if key != redkey:
 
         pc.updateSol(sol, number_containers, items_list, itmap)
 
@@ -143,16 +158,6 @@ if __name__ == "__main__":
 
         pc.saveSolution(key, sol)
 
-        logger.debug('New solution saved to cache. Key: ' + key)
+        logger.debug('New solution saved to cache. Key: %s', key)
 
     pc.toFile(sol, SOLFILE, STATSFILE)
-
-    # if pc.saveSolution(key, sol):
-
-    #     logger.debug('New solution saved to cache. Key: ' + key)
-
-    # else:
-
-    #     logger.debug('Solution retrieved from cache.')
-
-    #     pc.toFile(sol, SOLFILE, STATSFILE)
