@@ -1,0 +1,46 @@
+$def with (items)
+
+<SCRIPT>
+
+function calculateIt() {
+
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+        
+        if (this.readyState == 4 && this.status == 200) {
+        
+            document.getElementById('calculate').innerHTML = xhttp.responseText;
+        }
+        
+    };
+
+    xhttp.open("GET", "http://localhost:8080/calc", true);
+
+    xhttp.send();
+
+    document.getElementById('calculate').innerHTML = 'Calculating...';
+
+}
+
+</SCRIPT>
+
+
+<form action="javascript:calculateIt()" method="post">
+  <table>
+    <tr>
+      <th>Select your products</th>
+      <th></th>
+    </tr>
+$for item in items:
+    <tr>
+      <td>$item.name</td>
+      <td>
+        <input type="text" name="$item.name" value="0"/>
+      </td>
+    </tr>
+  </table>
+  <input type="submit" value="Calcular frete">
+</form>
+
+<DIV ID='calculate'></DIV>
