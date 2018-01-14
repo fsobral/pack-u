@@ -2,6 +2,18 @@ $def with (items)
 
 <SCRIPT>
 
+function readValues() {
+
+    it = '';
+
+    $for item in items:
+       
+       it += document.getElementById("$item.getUid()").value + ',';
+
+    return it.substring(0, it.length - 1);
+    
+}
+  
 function calculateIt() {
 
     var xhttp = new XMLHttpRequest();
@@ -15,7 +27,7 @@ function calculateIt() {
         
     };
 
-    xhttp.open("GET", "http://localhost:8080/calc", true);
+    xhttp.open("GET", "http://localhost:8080/calc?data=" + readValues(), true);
 
     xhttp.send();
 
@@ -34,13 +46,13 @@ function calculateIt() {
     </tr>
 $for item in items:
     <tr>
-      <td>$item.name</td>
+      <td>$item.getUid()</td>
       <td>
-        <input type="text" name="$item.name" value="0"/>
+        <input type="text" id="$item.getUid()" value="0"/>
       </td>
     </tr>
-  </table>
-  <input type="submit" value="Calcular frete">
+</table>
+<input type="submit" value="Calcular frete">
 </form>
 
 <DIV ID='calculate'></DIV>
