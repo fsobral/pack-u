@@ -1,5 +1,7 @@
 import web
 import time
+from packu import packureduce as pr
+from packu import packu as prr
 
 
 urls = (
@@ -22,7 +24,7 @@ class Seller:
 
     def GET(self):
 
-        items = [Item(1), Item(2), Item(3)]
+        items = pr.parse_items_files('items.txt')
 
         return render.products(items)
 
@@ -31,19 +33,35 @@ class Calculator:
 
     def GET(self):
 
-        # inp = web.input()
+        inp = web.input(data=None)
 
-        # numberOfItems = []
+        numberOfItems = []
 
-        # for it in inp.data.split(','):
+        for it in inp.data.split(','):
 
-        #     numberOfItems.append(it)
+            quant = 0
+
+            try:
+
+                quant = int(it)
+
+            except Exception:
+
+                pass
+
+            numberOfItems.append(quant)
 
         # Generates data file and runs
 
         startTime = time.perf_counter()
 
-        time.sleep(1)
+        with open("data.txt", "w") as fp:
+
+            for it in numberOfItems:
+
+                fp.write("{0:05d}\n".format(it))
+
+        prr.runPacku()
 
         endTime = time.perf_counter()
 
