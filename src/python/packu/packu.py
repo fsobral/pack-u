@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 
-import packureduce as pr
-import packucache as pc
+from . import packureduce as pr
+from . import packucache as pc
 import os
 import subprocess
 import logging
@@ -22,9 +22,8 @@ SOLFILE = 'solution.csv'
 
 STATSFILE = 'stats.csv'
 
-# Run Packu
 
-if __name__ == "__main__":
+def runPacku():
 
     # Set up logging
 
@@ -59,7 +58,7 @@ if __name__ == "__main__":
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
-        exit()
+        return
 
     logger.debug('Key {0:s} not found in cache.'.format(key))
 
@@ -90,7 +89,7 @@ if __name__ == "__main__":
 
         pc.toFile(sol, SOLFILE, STATSFILE)
 
-        exit()
+        return
 
     # Save original data and create reduced problem
 
@@ -111,7 +110,7 @@ if __name__ == "__main__":
             logger.error('Problems saving original data. ' +
                          'Possible loss of the file.')
 
-            exit()
+            return
 
     pr.save_remaining_items(DATA, remaining_items)
 
@@ -130,7 +129,7 @@ if __name__ == "__main__":
 
         os.rename(DATATMP, DATA)
 
-        exit()
+        return
 
     # Restore files
     # TODO: catch exceptions
@@ -161,3 +160,10 @@ if __name__ == "__main__":
         logger.debug('New solution saved to cache. Key: %s', key)
 
     pc.toFile(sol, SOLFILE, STATSFILE)
+
+
+# Run Packu
+
+if __name__ == "__main__":
+
+    runPacku()
