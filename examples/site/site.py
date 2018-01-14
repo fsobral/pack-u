@@ -69,7 +69,14 @@ class Calculator:
 
         frete = 0.0
 
-        return render.frete(frete, "{0:5.2f}".format(endTime - startTime))
+        with open("solution.csv", "r") as fp:
+
+            for l in fp:
+
+                frete += 14.80
+
+        return render.frete("R$ {0:10.2f}".format(frete),
+                            "{0:5.2f}".format(endTime - startTime))
 
 
 app = web.application(urls, globals())
