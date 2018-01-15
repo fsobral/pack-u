@@ -291,7 +291,7 @@ a simple, full functional example, of a website. The example uses
 Python 3 package *web.py* (version 0.40.dev0) in addition to the
 packages used for [caching results](#cache)
 
-    sudo aptitude install python3 couchdb pip3
+    sudo aptitude install python3 couchdb python3-pip
     sudo -H pip3 install CouchDB
     sudo -H pip3 install web.py==0.40.dev0
 
@@ -312,7 +312,7 @@ Finally, the server is started with command
 
     python3 site.py
 
-Open any browser and go to `http://localhost:8080/` . It is possible to
+Open any browser and go to `http://127.0.0.1:8080/` . It is possible to
 see the cache working with this full example. Also, it is possible to
 change the number of types of items and the web page will automatically
 follow the new configuration. Do not forget to clean the cache when
