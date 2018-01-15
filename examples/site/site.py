@@ -1,7 +1,7 @@
 import web
 import time
 from packu import packureduce as pr
-from packu import packu as prr
+from packu import packurun as prr
 
 
 urls = (

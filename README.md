@@ -247,7 +247,7 @@ executable is run:
 
     touch .silent
 
-## Caching results
+## Caching results <A ID='cache'></A>
 
 Given a set of type of items and containers, if many packing problems
 are thought to be solved, where only the number of items changes, then
@@ -276,9 +276,50 @@ files](#settings) and, instead of running the executable, call the
 In order to see the cache working, simply try to solve a time
 consuming instance twice.
 
+**Important**: It makes no sense to solve instances related to
+  different sets of items and containers using the same cache. It is
+  possible to receive totally wrong results! When changing the number
+  of types of items, it is necessary to delete the previous
+  cache. When changing only the number of types of containers it is
+  possible to keep the cache, but one has to solve each stored problem
+  again.
+
+## A full example: website
+
+In order to illustrate the possibilities of Pack-U, we have developed
+a simple, full functional example, of a website. The example uses
+Python 3 package *web.py* (version 0.40.dev0) in addition to the
+packages used for [caching results](#cache)
+
+    sudo aptitude install python3 couchdb pip3
+    sudo -H pip3 install CouchDB
+    sudo -H pip3 install web.py==0.40.dev0
+
+Then, it is necessary to add directory `pack-u/src/python` to the list
+of Python's library directories, what can be done in Linux with command
+
+    export PYTHONPATH='path_to_pack-u'/pack-u/src/python
+
+where `path_to_pack-u` is the location of Pack-U directory in your
+computer. Build Pack-U, go to `build` directory and copy all files and
+directories from `examples/site/`
+
+    make packu
+    cd build/
+    cp ../examples/site/* . -r
+
+Finally, the server is started with command
+
+    python3 site.py
+
+Open any browser and go to `http://localhost:8080/` . It is possible to
+see the cache working with this full example. Also, it is possible to
+change the number of types of items and the web page will automatically
+follow the new configuration. Do not forget to clean the cache when
+changing the problem's configuration.
 
 ## Improvements
-  - **January, 2018**: Cache
+  - **January, 2018**: Cache, site example
 
   - **November, 2017**: Items and containers have priority
       identification.
