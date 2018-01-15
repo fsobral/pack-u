@@ -247,7 +247,38 @@ executable is run:
 
     touch .silent
 
+## Caching results
+
+Given a set of type of items and containers, if many packing problems
+are thought to be solved, where only the number of items changes, then
+it may be interesting to cache each result. Pack-U allows the storage
+of the obtained results, which means that, if the solution of an
+already cached instance is asked, the computation time is almost 0.
+
+The current implementation of cache in Pack-U uses the programming
+language *Python 3*, the non-relational database *couchdb* and its
+interface to Python 3. In Linux systems you can easily install the
+necessary packages with commands:
+
+    sudo aptitude install python3 couchdb pip3
+    sudo -H pip3 install CouchDB
+
+Then, build Pack-U executable
+
+    make packu
+
+go to the `build` directory, create all the necessary [configuration
+files](#settings) and, instead of running the executable, call the
+**Python executable**
+
+    ../src/python/packu.py
+
+In order to see the cache working, simply try to solve a time
+consuming instance twice.
+
+
 ## Improvements
+  - **January, 2018**: Cache
 
   - **November, 2017**: Items and containers have priority
       identification.
