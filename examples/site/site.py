@@ -1,5 +1,6 @@
 import web
 import time
+import logging
 from packu import packureduce as pr
 from packu import packurun as prr
 
@@ -11,13 +12,6 @@ urls = (
 
 
 render = web.template.render('templates', base='base')
-
-
-class Item:
-
-    def __init__(self, n):
-
-        self.name = n
 
 
 class Seller:
@@ -82,5 +76,19 @@ class Calculator:
 app = web.application(urls, globals())
 
 if __name__ == '__main__':
+
+    # Set up logging
+
+    logger = logging.getLogger('packu')
+
+    handler = logging.StreamHandler()
+
+    handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+
+    logger.addHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # Start server
 
     app.run()

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import logging
 from packu import packurun
 
 
@@ -21,5 +22,19 @@ from packu import packurun
 # Run Packu
 
 if __name__ == "__main__":
+
+    # Set up logging
+
+    logger = logging.getLogger('packu')
+
+    handler = logging.StreamHandler()
+
+    handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+
+    logger.addHandler(handler)
+
+    logger.setLevel(logging.DEBUG)
+
+    # Run Pack-U
 
     packurun.runPacku()

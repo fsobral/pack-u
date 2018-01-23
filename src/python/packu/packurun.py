@@ -29,14 +29,6 @@ def runPacku():
 
     logger = logging.getLogger('packu')
 
-    handler = logging.StreamHandler()
-
-    handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
-
-    logger.addHandler(handler)
-
-    logger.setLevel(logging.DEBUG)
-
     # Load data
 
     items_list = pr.parse_items_files(ITEMS)
