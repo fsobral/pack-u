@@ -260,7 +260,7 @@ language *Python 3*, the non-relational database *couchdb* and its
 interface to Python 3. In Linux systems you can easily install the
 necessary packages with commands:
 
-    sudo aptitude install python3 couchdb pip3
+    sudo aptitude install python3 couchdb python3-pip
     sudo -H pip3 install CouchDB
 
 Then, build Pack-U executable
@@ -310,7 +310,7 @@ directories from `examples/site/`
 
 Finally, the server is started with command
 
-    python3 site.py
+    python3 site.py '127.0.0.1:8080'
 
 Open any browser and go to `http://127.0.0.1:8080/` . It is possible to
 see the cache working with this full example. Also, it is possible to
