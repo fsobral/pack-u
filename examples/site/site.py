@@ -67,7 +67,9 @@ class Calculator:
 
             for l in fp:
 
-                frete += 14.80
+                if not l.isspace():
+
+                    frete += 14.80
 
         return render.frete("R$ {0:10.2f}".format(frete),
                             "{0:5.2f}".format(endTime - startTime))
