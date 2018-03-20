@@ -347,3 +347,87 @@ def save_remaining_items(datafile, remaining_list):
         for nit in remaining_list:
 
             fp.write('{0:d}\n'.format(nit))
+
+
+def recursive_heuristic(items_list, items_to_place, containers_list):
+
+    """
+
+    This is the implementation of the Fortran heuristic.
+
+    """
+
+
+def _call_rec_heuristic(oIList, oItoPlace, pcItem,
+                        xo, yo, length, width, x, y):
+
+    if (pcItem >= len(oIList)):
+
+        logger.debug("Returning. No more item types to place.")
+
+        return
+
+    dy = yo
+    dx = xo
+
+    # Get the current item
+    it = oIList[pcItem]
+
+    logger.debug("Alocating item %d: (%s)", it.getUid(), it)
+
+    # Check if at least one item fits
+    if (yo + it.width_ > width or xo + it.length_ > length):
+
+        logger.debug("Returning. No more room for item %d.",
+                     it.getUid())
+
+        return
+
+    while (oItoPlace[pcItem] > 0):
+
+        if (dy + it.width_ > width):
+
+            dy = yo
+
+            dx += it.length_
+
+        if (dx + it.length_ > length):
+
+            logger.debug("No more space for item type %d.", it.getUid())
+
+            break
+
+        x.append(dx)
+        y.append(dy)
+
+        logger.debug("Placed item %d at position %6.2f, %6.2f",
+                     it.getUid(), dx, dy)
+
+        dy += it.width_
+
+        oItoPlace[pcItem] -= 1
+
+    # If the number of current items has finished (or they do not fit
+    # in the available space) and there is an unfinished column, then
+    # it is necessary to work in the reduced space. Otherwise, there
+    # is full room to place the remaining items.
+    if (dy > yo):
+
+        logger.debug("Solving reduced problem of size %6.2f x %6.2f"
+                     " with %d types of items.",
+                     it.length_, width - dy,
+                     len(oItoPlace) - (pcItem + 1))
+
+        _call_rec_heuristic(oIList, oItoPlace, pcItem + 1,
+                            dx, dy, dx + it.length_, width, x, y)
+
+        dy = yo
+        dx += it.length_
+
+    logger.debug("Solving remaining problem of size %6.2f x %6.2f with %d"
+                 " types of items.", length - dx, width - dy,
+                 len(oItoPlace) - (pcItem + 1))
+    _call_rec_heuristic(oIList, oItoPlace, pcItem + 1,
+                        dx, dy, length, width, x, y)
+
+    return
