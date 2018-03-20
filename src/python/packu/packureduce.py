@@ -357,7 +357,17 @@ def recursive_heuristic(items_list, items_to_place, containers_list):
 
     """
 
+    tmp = zip(items_list, items_to_place)
 
+    tmp.sort(key=lambda x: x[0], reverse=True)
+
+    ziter = zip(*tmp)
+
+    oIList = [i for i in next(ziter)]
+
+    oItoPlace = [i for i in next(ziter)]
+    
+    
 def _call_rec_heuristic(oIList, oItoPlace, pcItem,
                         xo, yo, length, width, pos=None):
 
