@@ -359,8 +359,30 @@ def recursive_heuristic(items_list, items_to_place, containers_list):
 
 
 def _call_rec_heuristic(oIList, oItoPlace, pcItem,
-                        xo, yo, length, width, x, y):
+                        xo, yo, length, width, pos=None):
 
+    # Check if have to store the positions
+    if (pos is not None):
+
+        if (len(pos) < len(oIList)):
+
+            pos = None
+
+            logger.warning("Invalid 'pos' list. Setting to None.")
+
+        else:
+
+            for l in pos:
+
+                if (type(l) is not list):
+
+                    logger.warning("Invalid 'pos' list. Setting to None.")
+
+                    pos = None
+
+                    break
+
+    # Check if there are items to pack
     if (pcItem >= len(oIList)):
 
         logger.debug("Returning. No more item types to place.")
@@ -397,8 +419,9 @@ def _call_rec_heuristic(oIList, oItoPlace, pcItem,
 
             break
 
-        x.append(dx)
-        y.append(dy)
+        if (pos is not None):
+
+            pos[pcItem].append((dx, dy))
 
         logger.debug("Placed item %d at position %6.2f, %6.2f",
                      it.getUid(), dx, dy)
@@ -419,7 +442,7 @@ def _call_rec_heuristic(oIList, oItoPlace, pcItem,
                      len(oItoPlace) - (pcItem + 1))
 
         _call_rec_heuristic(oIList, oItoPlace, pcItem + 1,
-                            dx, dy, dx + it.length_, width, x, y)
+                            dx, dy, dx + it.length_, width, pos=pos)
 
         dy = yo
         dx += it.length_
@@ -428,6 +451,6 @@ def _call_rec_heuristic(oIList, oItoPlace, pcItem,
                  " types of items.", length - dx, width - dy,
                  len(oItoPlace) - (pcItem + 1))
     _call_rec_heuristic(oIList, oItoPlace, pcItem + 1,
-                        dx, dy, length, width, x, y)
+                        dx, dy, length, width, pos=pos)
 
     return

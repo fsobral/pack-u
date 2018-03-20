@@ -374,18 +374,16 @@ class TestHeuristic(unittest.TestCase):
 
         width = c.width_
 
-        x = []
-
-        y = []
+        pos = [[]]
 
         _call_rec_heuristic(oIList, oItoPlace, pcItem,
-                            xo, yo, width, length, x, y)
+                            xo, yo, width, length, pos=pos)
 
-        self.assertEqual(oItoPlace[0], 0)
+        self.assertEqual([0], oItoPlace)
 
-        self.assertEqual(x, [0.0, 0.0, 2.0, 2.0, 4.0])
-
-        self.assertEqual(y, [0.0, 2.0, 0.0, 2.0, 0.0])
+        self.assertEqual([list(
+            zip([0.0, 0.0, 2.0, 2.0, 4.0],
+                [0.0, 2.0, 0.0, 2.0, 0.0]))], pos)
 
     def test_one_item_several(self):
 
@@ -405,18 +403,17 @@ class TestHeuristic(unittest.TestCase):
 
         width = c.width_
 
-        x = []
-
-        y = []
+        pos = [[]]
 
         _call_rec_heuristic(oIList, oItoPlace, pcItem,
-                            xo, yo, width, length, x, y)
+                            xo, yo, width, length, pos=pos)
 
-        self.assertEqual(oItoPlace[0], 1)
+        self.assertEqual([1], oItoPlace)
 
-        self.assertEqual(x, [0.0, 0.0, 2.0, 2.0])
+        l = [list(zip([0.0, 0.0, 2.0, 2.0],
+                      [0.0, 2.0, 0.0, 2.0]))]
 
-        self.assertEqual(y, [0.0, 2.0, 0.0, 2.0])
+        self.assertEqual(l, pos)
 
     def test_two_items_all(self):
 
@@ -437,15 +434,16 @@ class TestHeuristic(unittest.TestCase):
 
         width = c.width_
 
-        x = []
-
-        y = []
+        pos = [[], []]
 
         _call_rec_heuristic(oIList, oItoPlace, pcItem,
-                            xo, yo, width, length, x, y)
+                            xo, yo, width, length, pos=pos)
 
-        self.assertEqual(oItoPlace, [0, 0])
+        self.assertEqual([0, 0], oItoPlace)
 
-        self.assertEqual(x, [0.0, 0.0, 2.0, 2.0, 2.0, 3.0, 4.0, 4.0])
+        l = [list(zip([0.0, 0.0, 2.0, 2.0],
+                      [0.0, 2.0, 0.0, 2.0])),
+             list(zip([2.0, 3.0, 4.0, 4.0],
+                      [4.0, 4.0, 0.0, 1.0]))]
 
-        self.assertEqual(y, [0.0, 2.0, 0.0, 2.0, 4.0, 4.0, 0.0, 1.0])
+        self.assertEqual(l, pos)
