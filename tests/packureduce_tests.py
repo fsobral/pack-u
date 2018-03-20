@@ -2,12 +2,13 @@
 
 import unittest
 import re
+import logging
 # Working with files and directories
 import os
 # Packu package
 from packu.packureduce import Item, Container, parse_items_files, \
     parse_containers_files, calculate_maximum, load_items_to_place, \
-    PackuError, reduce
+    PackuError, reduce, _call_rec_heuristic
 
 
 class IntegrationTests(unittest.TestCase):
@@ -330,3 +331,119 @@ class TestItem(unittest.TestCase):
         item2 = Item(1, 2, 0)
 
         self.assertNotEqual(item1, item2)
+
+
+class TestHeuristic(unittest.TestCase):
+    """Tests the implementation of the heuristic procedure for reducing
+    the problem in Python.
+
+    """
+
+    def __init__(self, kwargs):
+
+        logger = logging.getLogger('packu')
+
+        if (not logger.hasHandlers()):
+
+            handler = logging.StreamHandler()
+
+            handler.setFormatter(
+                logging.Formatter('%(levelname)s: %(message)s'))
+
+            logger.addHandler(handler)
+
+            logger.setLevel(logging.DEBUG)
+
+        super().__init__(kwargs)
+
+    def test_one_item_few(self):
+
+        c = Container(5, 11, 0)
+
+        oIList = [Item(2, 2, 0)]
+
+        oItoPlace = [5]
+
+        pcItem = 0
+
+        xo = 0.0
+
+        yo = 0.0
+
+        length = c.length_
+
+        width = c.width_
+
+        pos = [[]]
+
+        _call_rec_heuristic(oIList, oItoPlace, pcItem,
+                            xo, yo, width, length, pos=pos)
+
+        self.assertEqual([0], oItoPlace)
+
+        self.assertEqual([list(
+            zip([0.0, 0.0, 2.0, 2.0, 4.0],
+                [0.0, 2.0, 0.0, 2.0, 0.0]))], pos)
+
+    def test_one_item_several(self):
+
+        c = Container(5, 5, 0)
+
+        oIList = [Item(2, 2, 0)]
+
+        oItoPlace = [5]
+
+        pcItem = 0
+
+        xo = 0.0
+
+        yo = 0.0
+
+        length = c.length_
+
+        width = c.width_
+
+        pos = [[]]
+
+        _call_rec_heuristic(oIList, oItoPlace, pcItem,
+                            xo, yo, width, length, pos=pos)
+
+        self.assertEqual([1], oItoPlace)
+
+        l = [list(zip([0.0, 0.0, 2.0, 2.0],
+                      [0.0, 2.0, 0.0, 2.0]))]
+
+        self.assertEqual(l, pos)
+
+    def test_two_items_all(self):
+
+        c = Container(5, 5, 0)
+
+        oIList = [Item(2, 2, 0, 0),
+                  Item(1, 1, 0, 1)]
+
+        oItoPlace = [4, 4]
+
+        pcItem = 0
+
+        xo = 0.0
+
+        yo = 0.0
+
+        length = c.length_
+
+        width = c.width_
+
+        pos = [[], []]
+
+        _call_rec_heuristic(oIList, oItoPlace, pcItem,
+                            xo, yo, width, length, pos=pos)
+
+        self.assertEqual([0, 0], oItoPlace)
+
+        l = [list(zip([0.0, 0.0, 2.0, 2.0],
+                      [0.0, 2.0, 0.0, 2.0])),
+             list(zip([2.0, 3.0, 4.0, 4.0],
+                      [4.0, 4.0, 0.0, 1.0]))]
+
+        self.assertEqual(l, pos)
