@@ -1289,14 +1289,6 @@ contains
 
     end if
 
-    if ( nit .gt. 0 ) then
-
-       nTContainers = nTContainers + 1
-
-       cTypeUsed_(nTContainers) = currContainer
-
-    end if
-
     call updateCurrItems(iini + nit, nTItems)
 
 1000 format('WARNING: Number of removed items greater than ', &
@@ -1346,6 +1338,10 @@ contains
     implicit none
 
     ! Removes the first nItems items
+
+    nTContainers = nTContainers + 1
+       
+    cTypeUsed_(nTContainers) = currContainer
 
     call removeItems(nItems)
 
