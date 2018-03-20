@@ -14,7 +14,7 @@ program algencanma
   implicit none
 
   ! LOCAL SCALARS
-  logical      :: hasAppended, useReduction
+  logical      :: hasAppended, useReduction, useHeuristic
   integer      :: allocerr, i, j, it, container, numberOfSolutions, &
        lastContainer, nAllocTrials, nCntnr
   ! Timing variables
@@ -48,6 +48,17 @@ program algencanma
 
   useReduction = .true.
 
+  ! Check arguments for Heuristic Mode
+  useHeuristic = .true.
+
+  if ( COMMAND_ARGUMENT_COUNT() .EQ. 1 ) then
+
+     CALL GET_COMMAND_ARGUMENT(1, strtmp)
+
+     read(strtmp, *) useHeuristic
+
+  end if
+  
   ! Start timing
 
   call SYSTEM_CLOCK(tini, ticks_ps)
@@ -146,7 +157,11 @@ program algencanma
      write(*,*) 'Solving allocation problem'
      write(*,*)
 
-     do while ( .true. )
+     if ( useHeuristic ) call drawSol(x, filename, .false.)
+        
+     
+     ! If in 'Heuristic Mode' do not go to solver
+     do while ( .not. useHeuristic )
 
         ! Optimize
 
