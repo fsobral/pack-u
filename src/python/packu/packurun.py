@@ -106,22 +106,48 @@ def runPacku():
 
     pr.save_remaining_items(DATA, remaining_items)
 
-    # Call Fortran
-    # TODO: if it takes too long, apply recursive heuristic.
+    # Call Fortran.
+    # ------------
+    #
+    # If the process takes more than 5 seconds to answer, the run the
+    # Heuristic procedure.
 
     logger.debug('Solution not found in cache. Will run Pack-U.')
 
     try:
 
-        subprocess.run(['./packu'], stdout=subprocess.PIPE)
+        subCompleted = subprocess.run(['./packu', 'F'],
+                                      timeout=5, stdout=subprocess.PIPE)
+
+    except subprocess.TimeoutExpired:
+
+        logger.debug("Timeout when running Pack-U. "
+                     "Will run Heuristic Mode.")
+
+        subCompleted = subprocess.run(['./packu', 'T'],
+                                      stdout=subprocess.PIPE)
 
     except KeyboardInterrupt:
+
+        logger.info("Program interrupted. Stopping Pack-U.")
 
         os.remove(DATA)
 
         os.rename(DATATMP, DATA)
 
         return
+
+    except Exception:
+
+        logger.error("Unknown error.")
+
+        os.remove(DATA)
+
+        os.rename(DATATMP, DATA)
+
+        return
+
+    logger.debug("%s", subCompleted.stdout.decode("utf8"))
 
     # Restore files
     # TODO: catch exceptions
