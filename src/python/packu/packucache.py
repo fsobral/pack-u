@@ -25,6 +25,10 @@ def getOrCreateDB(dbname):
 
     couch = couchdb.Server()
 
+    if not couch.__nonzero__():
+
+        return None
+
     if dbname not in couch:
 
         couch.create(dbname)
@@ -71,7 +75,7 @@ def getSolution(key):
 
     db = getOrCreateDB(DBNAME)
 
-    if key in db:
+    if db is not None and key in db:
 
         return db[key]
 
@@ -228,6 +232,10 @@ def saveSolution(key, sol):
         return None
 
     db = getOrCreateDB(DBNAME)
+
+    if db is None:
+
+        return False
 
     if key not in db:
 
