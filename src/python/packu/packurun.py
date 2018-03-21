@@ -119,10 +119,12 @@ def runPacku():
         subCompleted = subprocess.run(['./packu', 'F'],
                                       timeout=5, stdout=subprocess.PIPE)
 
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as t:
 
         logger.debug("Timeout when running Pack-U. "
                      "Will run Heuristic Mode.")
+
+        logger.debug("%s", t.stdout.decode("utf8"))
 
         subCompleted = subprocess.run(['./packu', 'T'],
                                       stdout=subprocess.PIPE)
