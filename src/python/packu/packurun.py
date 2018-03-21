@@ -22,6 +22,8 @@ SOLFILE = 'solution.csv'
 
 STATSFILE = 'stats.csv'
 
+DRAWFILE = 'sol9999.asy'
+
 
 def runPacku():
 
@@ -60,6 +62,9 @@ def runPacku():
 
     number_containers, remaining_items = \
         pr.reduce(items_list, itmap, items_to_place)
+
+    pr.draw_allocated(items_list, containers_list, itmap, number_containers,
+                      DRAWFILE)
 
     # Second cache: check if the reduced problem has already been
     # solved

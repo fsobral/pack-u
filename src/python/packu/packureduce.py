@@ -334,6 +334,60 @@ def reduce(items_list, itcont_map, items_to_place, remainingLevel=0):
     return allocated, remaining
 
 
+def draw_allocated(items_list, cont_list, itcont_map, allocated, drawFile):
+
+    """
+    This function draws in ASY format all the solutions that were obtained
+    by the Python reduction strategy.
+
+    """
+
+    fmtC = "draw(box((0,0), ({0:10.5f},{1:10.5f})), " + \
+           "currentpen + dashed + 2);\n"
+    fmtB = "drawBox(({0:10.5f},{1:10.5f}), {2:10.5f}, {3:10.5f}, " + \
+           "cor({4:2d}), currentpen, \"{5:4d}\");\n"
+
+    with open(drawFile, "w") as df:
+
+        df.write("import packlib;\nsettings.outformat = \"pdf\";\n\n")
+
+        for i in range(0, len(items_list)):
+
+            item = items_list[i]
+
+            container, nitems = itcont_map[item]
+
+            scale = max(1.0E-4, min(1.0, 15.0 / container.length_,
+                                    30.0 / container.width_))
+
+            for cnt in range(0, allocated[i]):
+
+                if (i > 0 or cnt > 0):
+
+                    df.write("\nnewpage();\n\n")
+
+                df.write("unitsize({0:10.5f}cm);\n".format(scale))
+
+                dx = 0.0
+
+                dy = 0.0
+
+                for j in range(0, nitems):
+
+                    if (dy + item.width_ > container.width_):
+
+                        dx += item.length_
+
+                        dy = 0.0
+
+                    df.write(fmtB.format(dx, dy, item.length_, item.width_,
+                                         item.getUid(), item.getUid()))
+
+                    dy += item.width_
+
+                df.write(fmtC.format(container.length_, container.width_))
+
+
 def save_remaining_items(datafile, remaining_list):
 
     """
