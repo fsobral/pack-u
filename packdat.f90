@@ -1129,7 +1129,7 @@ contains
 
   subroutine iswap(v, i, j)
 
-    ! Performs a swap of positions 'i' and 'j' in a real vector
+    ! Performs a swap of positions 'i' and 'j' in an integer vector
 
     implicit none
 
