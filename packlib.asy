@@ -4,7 +4,11 @@ pen cor(int i) {
   else if (i == 2) return rgb( 77 / 225.0, 112 / 225.0, 225 / 225.0);
   else if (i == 3) return rgb( 77 / 225.0, 225 / 225.0,  87 / 225.0);
   else if (i == 4) return rgb(160 / 225.0, 108 / 225.0, 224 / 225.0);
-
+  else if (i == 5) return rgb(255 / 225.0, 153 / 225.0,  15 / 225.0);
+  else if (i == 6) return rgb(255 / 225.0, 153 / 225.0,   0 / 225.0);
+  else if (i == 7) return rgb(255 / 225.0, 255 / 225.0, 102 / 225.0);
+  else if (i == 8) return rgb(  0 / 225.0, 153 / 225.0,  51 / 225.0);
+  
   return gray(0.5);
 
 }
