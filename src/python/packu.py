@@ -5,12 +5,24 @@ import logging
 import shutil
 from packu import packurun, packureduce
 
+
 # This map converts the number A of items of type i to B items of type
 # j plus C items of type i as a map (B, C). The numbers i and j used
 # as keys are in **Python mode**, which means that the first item is
 # 0.
+def reduce_box(x):
+
+    r = x % 4
+
+    if r == 3:
+
+        r = 0
+
+        return (int(round(x / 4, 0)), r)
+
+
 fisiomap = {
-    2: (4, lambda x: (int(round(x / 4, 0)), x % 4))
+    2: (4, reduce_box)
     }
 
 
