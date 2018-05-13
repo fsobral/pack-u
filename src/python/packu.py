@@ -3,6 +3,7 @@
 import logging
 # For safe copying
 import shutil
+import os
 from packu import packurun, packureduce
 
 
@@ -64,7 +65,9 @@ def restore_items(DATA, DATATMP):
 
     """
 
-    shutil.copy2(DATATMP, DATA)
+    if os.access(DATATMP, os.F_OK):
+
+        shutil.copy2(DATATMP, DATA)
 
 
 # Run Packu
@@ -91,9 +94,13 @@ if __name__ == "__main__":
 
     except:
 
-        logger.error("Error when converting problem data.")
+        logger.error("Error when converting problem data. Please check if " +
+                     "the items' file is correct and contains the extra " +
+                     "items need.")
 
         restore_items(packurun.DATA, "data.fisio.txt")
+
+        exit()
 
     # Run Pack-U
 
@@ -102,3 +109,5 @@ if __name__ == "__main__":
     # Restore
 
     restore_items(packurun.DATA, "data.fisio.txt")
+
+    os.remove("data.fisio.txt")
