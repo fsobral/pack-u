@@ -3,7 +3,7 @@
 
 from . import packureduce as pr
 from . import packucache as pc
-import os
+import shutil
 import subprocess
 import logging
 
@@ -92,22 +92,13 @@ def runPacku():
 
     try:
 
-        os.rename(DATA, DATATMP)
+        shutil.copy(DATA, DATATMP)
 
     except OSError as io:
 
-        try:
+        logger.error('Problems saving original data. Exiting.')
 
-            os.remove(DATATMP)
-
-            os.rename(DATA, DATATMP)
-
-        except OSError:
-
-            logger.error('Problems saving original data. ' +
-                         'Possible loss of the file.')
-
-            return
+        return
 
     pr.save_remaining_items(DATA, remaining_items)
 
@@ -134,34 +125,27 @@ def runPacku():
         subCompleted = subprocess.run(['./packu', 'T'],
                                       stdout=subprocess.PIPE)
 
+        logger.debug("%s", subCompleted.stdout.decode("utf8"))
+
     except KeyboardInterrupt:
 
         logger.info("Program interrupted. Stopping Pack-U.")
 
-        os.remove(DATA)
-
-        os.rename(DATATMP, DATA)
+        shutil.copy(DATATMP, DATA)
 
         return
 
     except Exception:
 
-        logger.error("Unknown error.")
+        logger.error("Unknown error. Restoring original file.")
 
-        os.remove(DATA)
-
-        os.rename(DATATMP, DATA)
+        shutil.copy(DATATMP, DATA)
 
         return
 
-    logger.debug("%s", subCompleted.stdout.decode("utf8"))
-
     # Restore files
-    # TODO: catch exceptions
 
-    os.remove(DATA)
-
-    os.rename(DATATMP, DATA)
+    shutil.copy(DATATMP, DATA)
 
     # At this moment, the solution is the reduced one
 
