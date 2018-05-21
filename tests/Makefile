@@ -59,6 +59,7 @@ fruit_driver_gen.f90 : $(TESTS_CODE)
 # 	$(FC) $(FOPT) -c $<
 
 pythontests:
+	cp $(BUILD)/build/packu .
 	export PYTHONPATH=$(PYTHONPATH):$(PACKUDIR)/src/python; \
 	       python3 packu_tests.py
 
@@ -67,5 +68,6 @@ clean :
 	rm -f $(FRUIT_GEN_CODE)
 	rm -f result.xml result_tmp.xml
 	rm -f $(PACKUOUTFILES) $(PACKUINFILES) true_sol.txt
+	rm -f ./packu
 
 .PHONY : all clean run
