@@ -128,6 +128,12 @@ def updateSol(sol, number_containers, items_list, itcont_map):
 
     items_to_place = [0 for i in range(0, numberOfItems)]
 
+    psol = []
+
+    if len(sol['solution']) > 0 and sol['solution'][0].isspace():
+
+        psol += sol['solution'][0]
+
     for i in range(0, numberOfItems):
 
         item = items_list[i]
@@ -142,7 +148,7 @@ def updateSol(sol, number_containers, items_list, itcont_map):
 
         for j in range(0, nc):
 
-            sol['solution'].append(formattedList)
+            psol.append(formattedList)
 
         items_to_place[i] = 0
 
@@ -155,6 +161,16 @@ def updateSol(sol, number_containers, items_list, itcont_map):
         nTotIt += nit * nc
 
         nTotCo += nc
+
+    # Append the last part of the solution, ignoring the first blank
+    # line, since 'psol' already has it. Here we are trying to follow
+    # Fortran output.
+
+    if len(sol['solution']) > 0:
+
+        psol += sol['solution'][1:]
+
+    sol['solution'] = psol
 
     # Update stats
 
